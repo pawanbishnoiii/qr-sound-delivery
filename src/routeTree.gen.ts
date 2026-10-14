@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedShipmentsIndexRouteImport } from './routes/_authenticated/shipments.index'
+import { Route as AuthenticatedShipmentsIdRouteImport } from './routes/_authenticated/shipments.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,12 +47,19 @@ const AuthenticatedShipmentsIndexRoute =
     path: '/shipments/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedShipmentsIdRoute =
+  AuthenticatedShipmentsIdRouteImport.update({
+    id: '/shipments/$id',
+    path: '/shipments/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/track': typeof TrackRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/shipments/': typeof AuthenticatedShipmentsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -59,6 +67,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/track': typeof TrackRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/shipments': typeof AuthenticatedShipmentsIndexRoute
 }
 export interface FileRoutesById {
@@ -68,13 +77,15 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/track': typeof TrackRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/_authenticated/shipments/': typeof AuthenticatedShipmentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/track' | '/dashboard' | '/shipments/'
+  fullPaths:
+    '/' | '/auth' | '/track' | '/dashboard' | '/shipments/$id' | '/shipments/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/track' | '/dashboard' | '/shipments'
+  to: '/' | '/auth' | '/track' | '/dashboard' | '/shipments/$id' | '/shipments'
   id:
     | '__root__'
     | '/'
@@ -82,6 +93,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/track'
     | '/_authenticated/dashboard'
+    | '/_authenticated/shipments/$id'
     | '/_authenticated/shipments/'
   fileRoutesById: FileRoutesById
 }
@@ -136,16 +148,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShipmentsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/shipments/$id': {
+      id: '/_authenticated/shipments/$id'
+      path: '/shipments/$id'
+      fullPath: '/shipments/$id'
+      preLoaderRoute: typeof AuthenticatedShipmentsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedShipmentsIdRoute: typeof AuthenticatedShipmentsIdRoute
   AuthenticatedShipmentsIndexRoute: typeof AuthenticatedShipmentsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedShipmentsIdRoute: AuthenticatedShipmentsIdRoute,
   AuthenticatedShipmentsIndexRoute: AuthenticatedShipmentsIndexRoute,
 }
 
