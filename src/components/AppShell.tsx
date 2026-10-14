@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { LayoutDashboard, Package, ScanLine, Users, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, Package, ScanLine, Users, LogOut, Menu, X, Layers, Plug } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/auth";
@@ -11,7 +11,9 @@ const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/shipments", label: "Shipments", icon: Package },
   { to: "/scan", label: "Scan", icon: ScanLine },
+  { to: "/lots", label: "Lots", icon: Layers },
   { to: "/team", label: "Team", icon: Users },
+  { to: "/providers", label: "Providers", icon: Plug },
 ] as const;
 
 export function AppShell({ title, actions, children }: { title: string; actions?: ReactNode; children: ReactNode }) {
@@ -29,7 +31,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
 
   const nav = (
     <nav className="flex flex-col gap-1">
-      {NAV.filter((n) => !(n.to === "/team" && role === "rider")).map((n) => (
+      {NAV.filter((n) => !(n.to === "/team" && role === "rider") && !(n.to === "/providers" && role !== "admin")).map((n) => (
         <Link
           key={n.to}
           to={n.to}
@@ -102,8 +104,8 @@ export function AppShell({ title, actions, children }: { title: string; actions?
       </main>
 
       {/* Mobile bottom bar */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t bg-card lg:hidden">
-        {NAV.map((n) => (
+      <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
+        {NAV.slice(0, 5).map((n) => (
           <Link
             key={n.to}
             to={n.to}

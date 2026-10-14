@@ -2,12 +2,14 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import QRCode from "qrcode";
-import { ArrowLeft, Printer, ChevronRight, XCircle, Undo2, IndianRupee, Trash2, Loader2, Phone, MapPin } from "lucide-react";
+import { ArrowLeft, Printer, ChevronRight, XCircle, Undo2, IndianRupee, Trash2, Loader2, Phone, MapPin, Copy, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { StatusBadge } from "@/components/StatusBadge";
 import { QrCode } from "@/components/QrCode";
+import { Barcode } from "@/components/Barcode";
+import { OtpDialog } from "@/components/OtpDialog";
+import { printLabels } from "@/lib/labels";
 import { Button } from "@/components/ui/button";
 import { useMe, useTeam } from "@/lib/auth";
 import { trackUrl, useShipments } from "@/lib/shipments";
@@ -27,6 +29,8 @@ function Detail() {
   useShipments(); // live updates
   const { data: team = [] } = useTeam();
   const [busy, setBusy] = useState(false);
+  const [otpOpen, setOtpOpen] = useState(false);
+  const lots = useQuery({ queryKey: ["lots"], queryFn: async () => (await supabase.from("lots").select("id, code, name").order("created_at", { ascending: false })).data ?? [] });
 
   const q = useQuery({
     queryKey: ["shipment", id],
@@ -54,24 +58,16 @@ function Detail() {
 
   async function printLabel() {
     if (!s) return;
-    const img = await QRCode.toDataURL(trackUrl(s.tracking_code), { width: 400, margin: 1 });
-    const w = window.open("", "_blank", "width=480,height=640");
-    if (!w) { toast.error("Allow pop-ups to print labels"); return; }
-    const esc = (v: string | null) => (v ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
-    w.document.write(`<html><head><title>${esc(s.tracking_code)}</title><style>
-      body{font-family:system-ui,sans-serif;margin:0;padding:16px}
-      .l{border:2px solid #111;border-radius:10px;padding:16px;width:360px}
-      h1{font-size:14px;margin:0 0 8px;letter-spacing:.08em}
-      .c{font:700 22px monospace;margin:8px 0}.r{font-size:13px;line-height:1.4}
-      .cod{margin-top:10px;padding:6px 10px;background:#111;color:#fff;display:inline-block;border-radius:6px;font-weight:700}
-    </style></head><body><div class="l"><h1>ROUTEFLOW OS</h1>
-      <img src="${img}" width="200" height="200"/><div class="c">${esc(s.tracking_code)}</div>
-      <div class="r"><b>To:</b> ${esc(s.receiver_name)} · ${esc(s.receiver_phone)}<br/>${esc(s.receiver_address)}<br/>${esc(s.city)} ${esc(s.pincode)}</div>
-      <div class="r" style="margin-top:6px"><b>From:</b> ${esc(s.sender_name)} ${esc(s.sender_phone)}</div>
-      <div class="r">Weight: ${s.weight_kg} kg</div>
-      ${Number(s.cod_amount) > 0 ? `<div class="cod">COD ₹${Number(s.cod_amount).toLocaleString("en-IN")}</div>` : `<div class="cod">PREPAID</div>`}
-    </div><script>onload=()=>{print()}</script></body></html>`);
-    w.document.close();
+    try { await printLabels([s]); } catch (e) { toast.error(e instanceof Error ? e.message : "Print failed"); }
+  }
+
+  async function duplicate() {
+    const n = Number(prompt("How many copies of this order?", "10"));
+    if (!n || n < 1) return;
+    const { data, error } = await supabase.rpc("duplicate_shipment", { _id: id, _copies: Math.min(n, 1000) });
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${data} copies created, each with its own barcode`);
+    qc.invalidateQueries({ queryKey: ["shipments"] });
   }
 
   if (q.isLoading) return <AppShell title="Shipment"><div className="grid place-items-center py-24"><Loader2 className="animate-spin" /></div></AppShell>;
@@ -119,9 +115,13 @@ function Detail() {
             <h2 className="font-bold">Actions</h2>
             <div className="mt-4 flex flex-wrap gap-2">
               {next && next !== "assigned" && !closed && (
-                <Button variant="hero" disabled={busy} onClick={() => update({ status: next }, `Marked ${STATUS_META[next].label}`)}>
-                  Mark {STATUS_META[next].label} <ChevronRight />
-                </Button>
+                next === "delivered" ? (
+                  <Button variant="hero" disabled={busy} onClick={() => setOtpOpen(true)}><ShieldCheck /> Deliver with OTP</Button>
+                ) : (
+                  <Button variant="hero" disabled={busy} onClick={() => update({ status: next }, `Marked ${STATUS_META[next].label}`)}>
+                    Mark {STATUS_META[next].label} <ChevronRight />
+                  </Button>
+                )
               )}
               {!closed && s.status !== "created" && (
                 <Button variant="outline" disabled={busy} onClick={() => update({ status: "failed" }, "Marked failed")}><XCircle /> Failed attempt</Button>
@@ -135,6 +135,7 @@ function Detail() {
               {s.status === "delivered" && Number(s.cod_amount) > 0 && !s.cod_collected && (
                 <Button variant="coral" disabled={busy} onClick={() => update({ cod_collected: true }, "COD collected")}><IndianRupee /> COD collected</Button>
               )}
+              {!isRider && <Button variant="outline" disabled={busy} onClick={duplicate}><Copy /> Copies</Button>}
               {(role === "admin" || (s.created_by === user?.id && s.status === "created")) && (
                 <Button
                   variant="ghost"
@@ -163,6 +164,11 @@ function Detail() {
                   {riders.map((r) => <option key={r.id} value={r.id}>{r.full_name}</option>)}
                 </select>
                 {riders.length === 0 && <p className="text-xs text-muted-foreground">No riders yet — add them on the Team page.</p>}
+                <p className="pt-3 text-sm font-medium">Lot</p>
+                <select className={selectCls} value={s.lot_id ?? ""} disabled={busy} onChange={(e) => update({ lot_id: e.target.value || null }, "Lot updated")}>
+                  <option value="">No lot</option>
+                  {(lots.data ?? []).map((l) => <option key={l.id} value={l.id}>{l.code} {l.name && `· ${l.name}`}</option>)}
+                </select>
               </div>
             )}
           </section>
@@ -173,7 +179,7 @@ function Detail() {
               {q.data!.events.map((e) => (
                 <li key={e.id} className="relative">
                   <span className="absolute -left-[26px] top-1 h-3 w-3 rounded-full bg-gradient-brand ring-4 ring-card" />
-                  <p className="text-sm font-semibold">{STATUS_META[e.status as ShipmentStatus].label}</p>
+                  <p className="text-sm font-semibold">{e.note ?? STATUS_META[e.status as ShipmentStatus].label}</p>
                   <p className="text-xs text-muted-foreground">{fmtDate(e.created_at)}{e.actor_id && names.get(e.actor_id) ? ` · by ${names.get(e.actor_id)}` : ""}</p>
                 </li>
               ))}
@@ -182,13 +188,17 @@ function Detail() {
         </div>
 
         <aside className="h-fit rounded-2xl border bg-card p-5 text-center shadow-card">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Parcel QR label</p>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">QR & barcode label</p>
           <div className="mx-auto mt-3 w-fit rounded-xl border p-3"><QrCode value={trackUrl(s.tracking_code)} size={200} /></div>
-          <p className="mt-3 font-mono text-lg font-bold">{s.tracking_code}</p>
+          <div className="mt-4 rounded-xl border bg-background p-3"><Barcode value={s.tracking_code} /></div>
+          <p className="mt-2 font-mono text-lg font-bold">{s.tracking_code}</p>
+          <p className="break-all text-[11px] text-muted-foreground">Order ID {s.id}</p>
+          {s.is_demo && <span className="mt-2 inline-block rounded-full bg-warning/30 px-2 py-0.5 text-xs font-semibold">Demo order</span>}
           <p className="text-xs text-muted-foreground">Scan in the app to update status, or by the customer to track.</p>
           <Button className="mt-4 w-full" variant="hero" onClick={printLabel}><Printer /> Print label</Button>
         </aside>
       </div>
+      <OtpDialog shipment={otpOpen ? s : null} onClose={() => setOtpOpen(false)} onDone={() => { qc.invalidateQueries({ queryKey: ["shipment", id] }); qc.invalidateQueries({ queryKey: ["shipments"] }); }} />
     </AppShell>
   );
 }

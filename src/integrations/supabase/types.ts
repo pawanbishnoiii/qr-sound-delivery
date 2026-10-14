@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      lots: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          manager_id: string
+          name: string
+          status: string
+        }
+        Insert: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          manager_id: string
+          name?: string
+          status?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          manager_id?: string
+          name?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lots_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -48,6 +86,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      providers: {
+        Row: {
+          category: string
+          config: Json
+          created_at: string
+          description: string
+          enabled: boolean
+          id: string
+          mode: string
+          name: string
+        }
+        Insert: {
+          category: string
+          config?: Json
+          created_at?: string
+          description?: string
+          enabled?: boolean
+          id?: string
+          mode?: string
+          name: string
+        }
+        Update: {
+          category?: string
+          config?: Json
+          created_at?: string
+          description?: string
+          enabled?: boolean
+          id?: string
+          mode?: string
+          name?: string
+        }
+        Relationships: []
       }
       shipment_events: {
         Row: {
@@ -92,10 +163,15 @@ export type Database = {
           created_at: string
           created_by: string | null
           delivered_at: string | null
+          delivery_otp: string
           distributor_id: string | null
           id: string
+          is_demo: boolean
+          lot_id: string | null
           manager_id: string | null
           notes: string | null
+          otp_sent_at: string | null
+          otp_verified_at: string | null
           pincode: string | null
           receiver_address: string
           receiver_name: string
@@ -115,10 +191,15 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           delivered_at?: string | null
+          delivery_otp?: string
           distributor_id?: string | null
           id?: string
+          is_demo?: boolean
+          lot_id?: string | null
           manager_id?: string | null
           notes?: string | null
+          otp_sent_at?: string | null
+          otp_verified_at?: string | null
           pincode?: string | null
           receiver_address: string
           receiver_name: string
@@ -138,10 +219,15 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           delivered_at?: string | null
+          delivery_otp?: string
           distributor_id?: string | null
           id?: string
+          is_demo?: boolean
+          lot_id?: string | null
           manager_id?: string | null
           notes?: string | null
+          otp_sent_at?: string | null
+          otp_verified_at?: string | null
           pincode?: string | null
           receiver_address?: string
           receiver_name?: string
@@ -154,7 +240,15 @@ export type Database = {
           updated_at?: string
           weight_kg?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "shipments_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -187,6 +281,84 @@ export type Database = {
         Args: { _role: Database["public"]["Enums"]["app_role"]; _user: string }
         Returns: string
       }
+      claim_shipment: {
+        Args: { _code: string }
+        Returns: {
+          city: string
+          cod_amount: number
+          cod_collected: boolean
+          created_at: string
+          created_by: string | null
+          delivered_at: string | null
+          delivery_otp: string
+          distributor_id: string | null
+          id: string
+          is_demo: boolean
+          lot_id: string | null
+          manager_id: string | null
+          notes: string | null
+          otp_sent_at: string | null
+          otp_verified_at: string | null
+          pincode: string | null
+          receiver_address: string
+          receiver_name: string
+          receiver_phone: string
+          rider_id: string | null
+          sender_name: string
+          sender_phone: string | null
+          status: Database["public"]["Enums"]["shipment_status"]
+          tracking_code: string
+          updated_at: string
+          weight_kg: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shipments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      deliver_with_otp: {
+        Args: { _id: string; _otp: string }
+        Returns: {
+          city: string
+          cod_amount: number
+          cod_collected: boolean
+          created_at: string
+          created_by: string | null
+          delivered_at: string | null
+          delivery_otp: string
+          distributor_id: string | null
+          id: string
+          is_demo: boolean
+          lot_id: string | null
+          manager_id: string | null
+          notes: string | null
+          otp_sent_at: string | null
+          otp_verified_at: string | null
+          pincode: string | null
+          receiver_address: string
+          receiver_name: string
+          receiver_phone: string
+          rider_id: string | null
+          sender_name: string
+          sender_phone: string | null
+          status: Database["public"]["Enums"]["shipment_status"]
+          tracking_code: string
+          updated_at: string
+          weight_kg: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shipments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      duplicate_shipment: {
+        Args: { _copies: number; _id: string }
+        Returns: number
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -199,6 +371,11 @@ export type Database = {
         Returns: boolean
       }
       is_ancestor: { Args: { _anc: string; _desc: string }; Returns: boolean }
+      seed_demo_orders: {
+        Args: { _city?: string; _count: number; _lot?: string }
+        Returns: number
+      }
+      send_delivery_otp: { Args: { _id: string }; Returns: Json }
       track_shipment: { Args: { _code: string }; Returns: Json }
     }
     Enums: {

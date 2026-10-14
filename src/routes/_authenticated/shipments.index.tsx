@@ -2,7 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Plus, Search, Loader2, Package } from "lucide-react";
+import { Plus, Search, Loader2, Package, Sparkles, Printer } from "lucide-react";
+import { SeedDialog } from "@/components/SeedDialog";
+import { printLabels } from "@/lib/labels";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -46,6 +48,7 @@ function Shipments() {
   const { data: team = [] } = useTeam();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<ShipmentStatus | "all">("all");
+  const [seed, setSeed] = useState(false);
   const names = useMemo(() => new Map(team.map((t) => [t.id, t.full_name])), [team]);
 
   const filtered = rows.filter((s) => {
@@ -60,7 +63,13 @@ function Shipments() {
   return (
     <AppShell
       title="Shipments"
-      actions={canCreate && <Button variant="hero" size="sm" onClick={() => navigate({ search: { new: true } })}><Plus /> <span className="hidden sm:inline">New</span></Button>}
+      actions={canCreate && (
+        <>
+          <Button variant="outline" size="sm" onClick={() => setSeed(true)}><Sparkles /> <span className="hidden sm:inline">Demo orders</span></Button>
+          <Button variant="outline" size="sm" className="hidden sm:inline-flex" disabled={!filtered.length} onClick={() => printLabels(filtered.slice(0, 200)).catch((e) => toast.error(e.message))}><Printer /> Labels</Button>
+          <Button variant="hero" size="sm" onClick={() => navigate({ search: { new: true } })}><Plus /> <span className="hidden sm:inline">New</span></Button>
+        </>
+      )}
     >
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
@@ -91,7 +100,7 @@ function Shipments() {
               <tbody className="divide-y">
                 {filtered.map((s) => (
                   <tr key={s.id} className="cursor-pointer hover:bg-muted/40" onClick={() => navigate({ to: "/shipments/$id", params: { id: s.id } })}>
-                    <td className="px-4 py-3 font-mono font-semibold">{s.tracking_code}</td>
+                    <td className="px-4 py-3 font-mono font-semibold">{s.tracking_code}{s.is_demo && <span className="ml-2 rounded bg-warning/30 px-1.5 py-0.5 font-sans text-[10px]">DEMO</span>}</td>
                     <td className="px-4 py-3">{s.receiver_name}<div className="text-xs text-muted-foreground">{s.receiver_phone}</div></td>
                     <td className="px-4 py-3">{s.city}</td>
                     <td className="px-4 py-3">{s.rider_id ? names.get(s.rider_id) ?? "—" : <span className="text-muted-foreground">Unassigned</span>}</td>
@@ -120,6 +129,7 @@ function Shipments() {
         )}
       </div>
 
+      {canCreate && <SeedDialog lotId={null} open={seed} onClose={() => setSeed(false)} />}
       {canCreate && (
         <CreateDialog
           open={!!search.new}

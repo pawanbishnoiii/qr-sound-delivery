@@ -19,13 +19,17 @@ export function QrScanner({ onScan, paused }: Props) {
     let cancelled = false;
     (async () => {
       try {
-        const { Html5Qrcode } = await import("html5-qrcode");
+        const { Html5Qrcode, Html5QrcodeSupportedFormats: F } = await import("html5-qrcode");
         if (cancelled) return;
-        const s = new Html5Qrcode(id.current, { verbose: false });
+        const s = new Html5Qrcode(id.current, {
+          verbose: false,
+          formatsToSupport: [F.QR_CODE, F.CODE_128, F.CODE_39, F.EAN_13, F.EAN_8, F.UPC_A, F.ITF],
+          useBarCodeDetectorIfSupported: true,
+        });
         scanner.current = s;
         await s.start(
           { facingMode: facing },
-          { fps: 10, qrbox: (w: number, h: number) => { const m = Math.floor(Math.min(w, h) * 0.7); return { width: m, height: m }; } },
+          { fps: 12, qrbox: (w: number, h: number) => ({ width: Math.floor(w * 0.85), height: Math.floor(h * 0.55) }) },
           (text: string) => { if (!pausedRef.current) cb.current(text); },
           () => {},
         );

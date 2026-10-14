@@ -1,125 +1,156 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
+import { z } from "zod";
 import { CheckCircle2, XCircle, Volume2, VolumeX, Keyboard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { QrScanner } from "@/components/QrScanner";
 import { StatusBadge } from "@/components/StatusBadge";
+import { OtpDialog } from "@/components/OtpDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useMe } from "@/lib/auth";
 import { parseScanned } from "@/lib/shipments";
 import { playError, playSuccess, unlockAudio } from "@/lib/sound";
-import { STATUS_META, type Shipment, type ShipmentStatus } from "@/lib/status";
+import { selectCls } from "@/lib/ui";
+import { STATUS_META, type Shipment } from "@/lib/status";
+
+const MODE_IDS = ["lookup", "lot", "claim", "picked_up", "in_transit", "out_for_delivery", "delivered"] as const;
+type Mode = (typeof MODE_IDS)[number];
 
 export const Route = createFileRoute("/_authenticated/scan")({
-  head: () => ({ meta: [{ title: "Scan parcels — RouteFlow OS" }, { name: "description", content: "Scan QR labels with your camera" }] }),
+  validateSearch: z.object({ mode: z.enum(MODE_IDS).optional(), lot: z.string().optional() }),
+  head: () => ({ meta: [{ title: "Scan parcels — RouteFlow OS" }, { name: "description", content: "Scan QR codes and barcodes with your camera" }] }),
   component: ScanPage,
 });
 
-type Mode = "lookup" | Extract<ShipmentStatus, "picked_up" | "in_transit" | "out_for_delivery" | "delivered">;
-const MODES: { id: Mode; label: string }[] = [
-  { id: "lookup", label: "Lookup" },
-  { id: "picked_up", label: "Pickup" },
-  { id: "in_transit", label: "In transit" },
-  { id: "out_for_delivery", label: "Out for delivery" },
-  { id: "delivered", label: "Delivered" },
-];
+const LABEL: Record<Mode, string> = {
+  lookup: "Lookup", lot: "Add to lot", claim: "Sort / claim", picked_up: "Pickup",
+  in_transit: "In transit", out_for_delivery: "Out for delivery", delivered: "Deliver (OTP)",
+};
 
 type Result = { ok: boolean; code: string; msg: string; shipment?: Shipment; at: number };
 
 function ScanPage() {
   const qc = useQueryClient();
-  const [mode, setMode] = useState<Mode>("lookup");
+  const { role } = useMe();
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: "/scan" });
+  const mode: Mode = search.mode ?? (role === "rider" ? "claim" : "lookup");
+  const setMode = (m: Mode) => navigate({ search: (p) => ({ ...p, mode: m }) });
   const [sound, setSound] = useState(true);
   const [busy, setBusy] = useState(false);
   const [manual, setManual] = useState("");
   const [log, setLog] = useState<Result[]>([]);
+  const [otpFor, setOtpFor] = useState<Shipment | null>(null);
   const last = useRef<{ code: string; t: number }>({ code: "", t: 0 });
+
+  const lots = useQuery({
+    queryKey: ["lots"],
+    queryFn: async () => (await supabase.from("lots").select("*").order("created_at", { ascending: false })).data ?? [],
+  });
+  const modes = MODE_IDS.filter((m) => (role === "rider" ? m !== "lot" : m !== "claim"));
+
+  function push(r: Result) {
+    if (sound) (r.ok ? playSuccess : playError)();
+    setLog((l) => [r, ...l].slice(0, 30));
+  }
 
   async function handle(raw: string) {
     const code = parseScanned(raw);
     const now = Date.now();
-    if (!code || (code === last.current.code && now - last.current.t < 3000)) return;
+    if (!code || (code === last.current.code && now - last.current.t < 3000) || otpFor) return;
     last.current = { code, t: now };
     setBusy(true);
     try {
-      const { data: s, error } = await supabase.from("shipments").select("*").eq("tracking_code", code).maybeSingle();
+      if (mode === "claim") {
+        const { data, error } = await supabase.rpc("claim_shipment", { _code: code });
+        if (error) throw error;
+        push({ ok: true, code, msg: "Added to your deliveries", shipment: data as Shipment, at: now });
+        qc.invalidateQueries({ queryKey: ["shipments"] });
+        return;
+      }
+      const { data: s, error } = await supabase.from("shipments").select("*").or(`tracking_code.eq.${code.replace(/[^A-Z0-9-]/g, "")},id.eq.${/^[0-9a-f-]{36}$/i.test(code) ? code.toLowerCase() : "00000000-0000-0000-0000-000000000000"}`).maybeSingle();
       if (error) throw error;
       if (!s) throw new Error("Not found or not in your team");
       let shipment = s as Shipment;
       let msg = `Found · ${STATUS_META[shipment.status].label}`;
-      if (mode !== "lookup") {
+      if (mode === "lot") {
+        if (!search.lot) throw new Error("Choose a lot first");
+        const { data: u, error: ue } = await supabase.from("shipments").update({ lot_id: search.lot }).eq("id", shipment.id).select("*").single();
+        if (ue) throw ue;
+        shipment = u as Shipment; msg = "Added to lot";
+      } else if (mode === "delivered") {
+        if (shipment.status === "delivered") msg = "Already delivered";
+        else { setOtpFor(shipment); msg = "Waiting for customer OTP"; }
+      } else if (mode !== "lookup") {
         if (shipment.status === mode) msg = `Already ${STATUS_META[mode].label}`;
-        else if (shipment.status === "delivered" || shipment.status === "returned") throw new Error(`Already ${STATUS_META[shipment.status].label}`);
+        else if (["delivered", "returned"].includes(shipment.status)) throw new Error(`Already ${STATUS_META[shipment.status].label}`);
         else {
           const { data: u, error: ue } = await supabase.from("shipments").update({ status: mode }).eq("id", shipment.id).select("*").single();
           if (ue) throw ue;
-          shipment = u as Shipment;
-          msg = `Updated → ${STATUS_META[mode].label}`;
-          qc.invalidateQueries({ queryKey: ["shipments"] });
+          shipment = u as Shipment; msg = `Updated → ${STATUS_META[mode].label}`;
         }
       }
-      if (sound) playSuccess();
-      setLog((l) => [{ ok: true, code, msg, shipment, at: now }, ...l].slice(0, 20));
+      qc.invalidateQueries({ queryKey: ["shipments"] });
+      push({ ok: true, code, msg, shipment, at: now });
     } catch (e) {
-      if (sound) playError();
-      setLog((l) => [{ ok: false, code, msg: e instanceof Error ? e.message : "Scan failed", at: now }, ...l].slice(0, 20));
+      push({ ok: false, code, msg: e instanceof Error ? e.message : "Scan failed", at: now });
     } finally {
       setBusy(false);
     }
   }
 
   const latest = log[0];
+  const okCount = log.filter((l) => l.ok).length;
 
   return (
     <AppShell
       title="Scan parcels"
-      actions={
-        <Button variant="outline" size="icon" onClick={() => { unlockAudio(); setSound((v) => !v); }} aria-label="Toggle sound">
-          {sound ? <Volume2 /> : <VolumeX />}
-        </Button>
-      }
+      actions={<Button variant="outline" size="icon" onClick={() => { unlockAudio(); setSound((v) => !v); }} aria-label="Toggle sound">{sound ? <Volume2 /> : <VolumeX />}</Button>}
     >
       <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
-        <div onClick={unlockAudio}>
-          <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
-            {MODES.map((m) => (
-              <button
-                key={m.id}
-                onClick={() => setMode(m.id)}
-                className={`shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${mode === m.id ? "border-transparent bg-gradient-brand text-primary-foreground shadow-glow" : "bg-card hover:border-primary"}`}
-              >
-                {m.label}
+        <div onClick={unlockAudio} className="min-w-0">
+          <div className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+            {modes.map((m) => (
+              <button key={m} onClick={() => setMode(m)}
+                className={`shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${mode === m ? "border-transparent bg-gradient-brand text-primary-foreground shadow-glow" : "bg-card hover:border-primary"}`}>
+                {LABEL[m]}
               </button>
             ))}
           </div>
-          <QrScanner onScan={handle} paused={busy} />
-          <form className="mt-4 flex gap-2" onSubmit={(e) => { e.preventDefault(); unlockAudio(); last.current = { code: "", t: 0 }; void handle(manual); setManual(""); }}>
+          {(mode === "lot" || mode === "claim") && (
+            <select className={`${selectCls} mb-4`} value={search.lot ?? ""} onChange={(e) => navigate({ search: (p) => ({ ...p, lot: e.target.value || undefined }) })}>
+              <option value="">{mode === "claim" ? "Any lot from my manager" : "Select lot to add parcels into"}</option>
+              {(lots.data ?? []).map((l) => <option key={l.id} value={l.id}>{l.code} {l.name && `· ${l.name}`}</option>)}
+            </select>
+          )}
+          <QrScanner onScan={handle} paused={busy || !!otpFor} />
+          <p className="mt-2 text-center text-xs text-muted-foreground">Reads QR codes and barcodes · hold the label inside the frame</p>
+          <form className="mt-3 flex gap-2" onSubmit={(e) => { e.preventDefault(); unlockAudio(); last.current = { code: "", t: 0 }; void handle(manual); setManual(""); }}>
             <div className="relative flex-1">
               <Keyboard className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input value={manual} onChange={(e) => setManual(e.target.value)} placeholder="Type tracking code" className="pl-9 font-mono uppercase" maxLength={40} />
+              <Input value={manual} onChange={(e) => setManual(e.target.value)} placeholder="Tracking code or order ID" className="pl-9 font-mono uppercase" maxLength={40} />
             </div>
             <Button type="submit" variant="hero" disabled={!manual.trim() || busy}>Go</Button>
           </form>
         </div>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
+          <div className="flex items-center justify-between rounded-2xl bg-gradient-hero p-4 text-navy-foreground">
+            <div><p className="text-xs opacity-75">Mode</p><p className="font-display text-lg font-bold">{LABEL[mode]}</p></div>
+            <div className="text-right"><p className="text-xs opacity-75">Successful scans</p><p className="font-display text-2xl font-bold tabular">{okCount}</p></div>
+          </div>
           {latest ? (
-            <div className={`rounded-2xl border-2 p-5 shadow-card animate-rise ${latest.ok ? "border-success bg-success/10" : "border-destructive bg-destructive/10"}`} key={latest.at}>
+            <div key={latest.at} className={`rounded-2xl border-2 p-5 shadow-card animate-rise ${latest.ok ? "border-success bg-success/10" : "border-destructive bg-destructive/10"}`}>
               <div className="flex items-center gap-3">
                 {latest.ok ? <CheckCircle2 className="h-8 w-8 shrink-0 text-success" /> : <XCircle className="h-8 w-8 shrink-0 text-destructive" />}
-                <div className="min-w-0">
-                  <p className="truncate font-mono text-lg font-bold">{latest.code}</p>
-                  <p className="text-sm">{latest.msg}</p>
-                </div>
+                <div className="min-w-0"><p className="truncate font-mono text-lg font-bold">{latest.code}</p><p className="text-sm">{latest.msg}</p></div>
               </div>
               {latest.shipment && (
                 <Link to="/shipments/$id" params={{ id: latest.shipment.id }} className="mt-4 block rounded-xl bg-card p-4">
-                  <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
-                    <p className="truncate font-semibold">{latest.shipment.receiver_name}</p>
-                    <StatusBadge status={latest.shipment.status} />
-                  </div>
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2"><p className="truncate font-semibold">{latest.shipment.receiver_name}</p><StatusBadge status={latest.shipment.status} /></div>
                   <p className="truncate text-sm text-muted-foreground">{latest.shipment.receiver_address}, {latest.shipment.city}</p>
                   {Number(latest.shipment.cod_amount) > 0 && <p className="mt-1 text-sm font-bold text-coral tabular">Collect COD ₹{Number(latest.shipment.cod_amount).toLocaleString("en-IN")}</p>}
                 </Link>
@@ -127,7 +158,7 @@ function ScanPage() {
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed bg-card p-8 text-center text-sm text-muted-foreground">
-              Point the camera at a parcel QR label. Choose a mode above to update status automatically on each scan.
+              Point the camera at a parcel label. Each successful scan plays a chime; problems play a buzz.
             </div>
           )}
           {log.length > 1 && (
@@ -145,6 +176,7 @@ function ScanPage() {
           )}
         </div>
       </div>
+      <OtpDialog shipment={otpFor} onClose={() => setOtpFor(null)} onDone={(s) => { push({ ok: true, code: s.tracking_code, msg: "Delivered with OTP", shipment: s, at: Date.now() }); qc.invalidateQueries({ queryKey: ["shipments"] }); }} />
     </AppShell>
   );
 }
