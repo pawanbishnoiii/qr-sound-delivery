@@ -46,7 +46,7 @@ function Detail() {
     setBusy(true);
     const { error } = await supabase.from("shipments").update(patch).eq("id", id);
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(msg);
     qc.invalidateQueries({ queryKey: ["shipment", id] });
     qc.invalidateQueries({ queryKey: ["shipments"] });
@@ -56,7 +56,7 @@ function Detail() {
     if (!s) return;
     const img = await QRCode.toDataURL(trackUrl(s.tracking_code), { width: 400, margin: 1 });
     const w = window.open("", "_blank", "width=480,height=640");
-    if (!w) return toast.error("Allow pop-ups to print labels");
+    if (!w) { toast.error("Allow pop-ups to print labels"); return; }
     const esc = (v: string | null) => (v ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
     w.document.write(`<html><head><title>${esc(s.tracking_code)}</title><style>
       body{font-family:system-ui,sans-serif;margin:0;padding:16px}
@@ -143,7 +143,7 @@ function Detail() {
                   onClick={async () => {
                     if (!confirm("Delete this shipment?")) return;
                     const { error } = await supabase.from("shipments").delete().eq("id", id);
-                    if (error) return toast.error(error.message);
+                    if (error) { toast.error(error.message); return; }
                     toast.success("Deleted");
                     navigate({ to: "/shipments" });
                   }}

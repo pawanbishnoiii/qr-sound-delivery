@@ -45,7 +45,7 @@ export function creatableRoles(role: AppRole | null | undefined): AppRole[] {
 export function nextStatus(s: ShipmentStatus): ShipmentStatus | null {
   const i = STATUS_FLOW.indexOf(s);
   if (i < 0 || i >= STATUS_FLOW.length - 1) return null;
-  return STATUS_FLOW[i + 1];
+  return STATUS_FLOW[i + 1] ?? null;
 }
 
 export const inr = (n: number) =>

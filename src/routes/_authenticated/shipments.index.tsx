@@ -140,7 +140,7 @@ function CreateDialog({ open, onClose, riders, onCreated }: {
     e.preventDefault();
     const fd = Object.fromEntries(new FormData(e.currentTarget));
     const parsed = shipmentSchema.safeParse(fd);
-    if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
+    if (!parsed.success) { toast.error(parsed.error.issues[0]?.message ?? "Invalid input"); return; }
     setBusy(true);
     const { rider_id, ...rest } = parsed.data;
     const { data, error } = await supabase.from("shipments").insert({ ...rest, rider_id: rider_id || null }).select("id").single();

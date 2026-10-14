@@ -124,7 +124,7 @@ function AddDialog({ open, onClose, team, myRole, myId, defaultParent }: {
   const create = useServerFn(createMember);
   const roles = creatableRoles(myRole);
   const parentRow = team.find((t) => t.id === defaultParent);
-  const initialRole: AppRole = parentRow?.role === "distributor" ? "manager" : parentRow?.role === "manager" ? "rider" : roles[0];
+  const initialRole: AppRole = parentRow?.role === "distributor" ? "manager" : parentRow?.role === "manager" ? "rider" : (roles[0] ?? "rider");
   const [role, setRole] = useState<AppRole>(initialRole);
   const [parent, setParent] = useState<string>(defaultParent ?? myId);
   const [busy, setBusy] = useState(false);
