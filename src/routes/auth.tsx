@@ -28,7 +28,9 @@ function AuthPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"in" | "up">("in");
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "", name: "" });
+  const [form, setForm] = useState({ email: "", password: "", name: "", phone: "" });
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -46,10 +48,14 @@ function AuthPage() {
         navigate({ to: "/dashboard", replace: true });
       } else {
         if (form.password.length < 8) throw new Error("Password must be at least 8 characters");
+        const phone = form.phone.replace(/[^0-9]/g, "");
+        if (!/^[6-9][0-9]{9}$/.test(phone)) throw new Error("Enter a valid 10-digit mobile number");
+        if (!otpSent) { setOtpSent(true); toast.success("OTP sent to +91 " + phone + " (demo OTP: 1234)"); return; }
+        if (otp !== "1234") throw new Error("Incorrect OTP");
         const { data, error } = await supabase.auth.signUp({
           email: form.email,
           password: form.password,
-          options: { emailRedirectTo: window.location.origin + "/dashboard", data: { full_name: form.name } },
+          options: { emailRedirectTo: window.location.origin + "/dashboard", data: { full_name: form.name, phone: "+91" + form.phone.replace(/[^0-9]/g, ""), phone_verified_demo: true } },
         });
         if (error) throw error;
         if (data.session) navigate({ to: "/dashboard", replace: true });
@@ -91,6 +97,20 @@ function AuthPage() {
                 <Input id="name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
               </div>
             )}
+            {mode === "up" && (
+              <div className="space-y-1.5">
+                <Label htmlFor="phone">Mobile number</Label>
+                <div className="flex gap-2"><span className="grid h-10 place-items-center rounded-md border px-3 text-sm text-muted-foreground">+91</span>
+                <Input id="phone" type="tel" inputMode="numeric" required maxLength={10} disabled={otpSent} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+              </div>
+            )}
+            {mode === "up" && otpSent && (
+              <div className="space-y-1.5">
+                <Label htmlFor="otp">OTP sent to your mobile</Label>
+                <Input id="otp" inputMode="numeric" required maxLength={4} autoFocus value={otp} onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ""))} placeholder="4-digit code" className="font-mono tracking-[0.5em]" />
+                <p className="text-xs text-muted-foreground">Demo mode: use 1234. <button type="button" className="text-primary" onClick={() => { setOtpSent(false); setOtp(""); }}>Change number</button></p>
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
@@ -100,7 +120,7 @@ function AuthPage() {
               <Input id="pw" type="password" required minLength={mode === "up" ? 8 : undefined} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
             </div>
             <Button type="submit" variant="hero" className="h-11 w-full" disabled={busy}>
-              {busy && <Loader2 className="animate-spin" />} {mode === "in" ? "Sign in" : "Create account"}
+              {busy && <Loader2 className="animate-spin" />} {mode === "in" ? "Sign in" : otpSent ? "Verify OTP & create account" : "Send OTP"}
             </Button>
           </form>
           <p className="mt-6 text-center text-sm text-muted-foreground">

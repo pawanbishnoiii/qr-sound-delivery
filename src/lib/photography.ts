@@ -9,4 +9,6 @@ import conveyor from '@/assets/bnoy-conveyor.webp';
 import hub from '@/assets/bnoy-hub.webp';
 import operations from '@/assets/bnoy-operations.webp';
 import parcels from '@/assets/bnoy-parcels.webp';
-export const photos = { warehouse, handover, dispatch, packaging, scanner, merchant, rider, conveyor, hub, operations, parcels };
+import returnPickup from '@/assets/bnoy-return-pickup.webp';
+import returnsDesk from '@/assets/bnoy-returns-desk.webp';
+export const photos = { warehouse, handover, dispatch, packaging, scanner, merchant, rider, conveyor, hub, operations, parcels, returnPickup, returnsDesk };

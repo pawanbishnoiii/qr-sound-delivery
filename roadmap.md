@@ -8,4 +8,5 @@
 
 ## External dependencies
 - Live courier credentials and provider-approved callback authentication are required before real partner traffic.
-- The uploaded enterprise specification spans later phases (tenant migration, finance, phone authentication, maps); preserve existing flows during this focused upgrade.
+- The uploaded enterprise specification spans later phases (tenant migration, finance, phone authentication, maps); preserve existing flows during this focused upgrade.- [x] Phone + demo OTP signup, returns/cancellations with photos and live location, partner API keys and signed webhooks.
+- [ ] Real SMS OTP — blocked on an SMS provider account.

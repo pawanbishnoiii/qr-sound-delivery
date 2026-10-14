@@ -71,12 +71,21 @@ function Detail() {
     qc.invalidateQueries({ queryKey: ["shipments"] });
   }
 
+  async function requestReturn(kind: "customer_return" | "rto" | "cancellation") {
+    const reason = prompt(kind === "cancellation" ? "Why is this parcel being cancelled?" : "Reason for return pickup?", "");
+    if (!reason || reason.trim().length < 2 || !user) return;
+    const { error } = await supabase.from("return_requests").insert({ shipment_id: id, kind, reason: reason.trim().slice(0, 500), created_by: user.id, rider_id: s?.rider_id ?? null });
+    if (error) { toast.error(error.message); return; }
+    toast.success(kind === "cancellation" ? "Parcel cancelled — return to hub is being tracked" : "Return pickup created");
+    navigate({ to: "/returns" });
+  }
+
   if (q.isLoading) return <AppShell title="Shipment"><div className="grid place-items-center py-24"><Loader2 className="animate-spin" /></div></AppShell>;
   if (!s) return <AppShell title="Shipment"><div className="py-24 text-center"><p className="font-semibold">Shipment not found or not in your team.</p><Link to="/shipments" className="text-primary">Back to shipments</Link></div></AppShell>;
 
   const next = nextStatus(s.status);
   const isRider = role === "rider";
-  const closed = ["delivered", "failed", "returned"].includes(s.status);
+  const closed = ["delivered", "failed", "returned", "cancelled"].includes(s.status);
   const riders = team.filter((t) => t.role === "rider");
 
   return (
@@ -137,6 +146,8 @@ function Detail() {
                 <Button variant="coral" disabled={busy} onClick={() => update({ cod_collected: true }, "COD collected")}><IndianRupee /> COD collected</Button>
               )}
               {!isRider && <Button variant="outline" disabled={busy} onClick={duplicate}><Copy /> Copies</Button>}
+              {["delivered", "failed"].includes(s.status) && <Button variant="outline" disabled={busy} onClick={() => requestReturn(s.status === "failed" ? "rto" : "customer_return")}><Undo2 /> Request return pickup</Button>}
+              {!["delivered", "returned", "cancelled"].includes(s.status) && <Button variant="outline" className="text-destructive" disabled={busy} onClick={() => requestReturn("cancellation")}><XCircle /> Cancel parcel</Button>}
               {(role === "admin" || (s.created_by === user?.id && s.status === "created")) && (
                 <Button
                   variant="ghost"
