@@ -14,3 +14,8 @@
 - Shipment ownership columns (created_by, distributor_id, manager_id) are filled by DB trigger from the rider/creator chain — why: clients can't spoof hierarchy.
 - Creating/removing/moving team members goes through server functions in `src/lib/team.functions.ts` (admin client after role checks) — why: auth user creation needs privileged access.
 - Public tracking uses the `track_shipment` RPC only — why: never expose shipments table to anon.
+
+- Courier accounts reuse platform admin authorization; exchange rows are admin-only with RLS — why: credentials and external orders must not leak across operational roles.
+- Courier secrets are deployment secrets read inside server handlers, never partner metadata — why: partner configuration is visible to clients.
+- Custom webhooks accept only the normalized order-exchange contract; native callbacks require provider-specific verification — why: unsupported payload and signature formats must not be guessed.
+- Public visual content uses individual bundled logistics photos and GSAP matchMedia cleanup — why: predictable rendering and reduced-motion accessibility.

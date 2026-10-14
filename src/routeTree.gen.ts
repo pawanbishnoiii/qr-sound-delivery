@@ -24,6 +24,7 @@ import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/t
 import { Route as AuthenticatedShipmentsIndexRouteImport } from './routes/_authenticated/shipments.index'
 import { Route as AuthenticatedShipmentsIdRouteImport } from './routes/_authenticated/shipments.$id'
 import { Route as ApiPublicTrackCodeRouteImport } from './routes/api/public/track.$code'
+import { Route as ApiPublicCouriersPartnerIdWebhookRouteImport } from './routes/api/public/couriers.$partnerId.webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -101,6 +102,12 @@ const ApiPublicTrackCodeRoute = ApiPublicTrackCodeRouteImport.update({
   path: '/api/public/track/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCouriersPartnerIdWebhookRoute =
+  ApiPublicCouriersPartnerIdWebhookRouteImport.update({
+    id: '/api/public/couriers/$partnerId/webhook',
+    path: '/api/public/couriers/$partnerId/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/shipments/': typeof AuthenticatedShipmentsIndexRoute
   '/api/public/track/$code': typeof ApiPublicTrackCodeRoute
+  '/api/public/couriers/$partnerId/webhook': typeof ApiPublicCouriersPartnerIdWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -133,6 +141,7 @@ export interface FileRoutesByTo {
   '/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/shipments': typeof AuthenticatedShipmentsIndexRoute
   '/api/public/track/$code': typeof ApiPublicTrackCodeRoute
+  '/api/public/couriers/$partnerId/webhook': typeof ApiPublicCouriersPartnerIdWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -151,6 +160,7 @@ export interface FileRoutesById {
   '/_authenticated/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/_authenticated/shipments/': typeof AuthenticatedShipmentsIndexRoute
   '/api/public/track/$code': typeof ApiPublicTrackCodeRoute
+  '/api/public/couriers/$partnerId/webhook': typeof ApiPublicCouriersPartnerIdWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/shipments/$id'
     | '/shipments/'
     | '/api/public/track/$code'
+    | '/api/public/couriers/$partnerId/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/shipments/$id'
     | '/shipments'
     | '/api/public/track/$code'
+    | '/api/public/couriers/$partnerId/webhook'
   id:
     | '__root__'
     | '/'
@@ -202,6 +214,7 @@ export interface FileRouteTypes {
     | '/_authenticated/shipments/$id'
     | '/_authenticated/shipments/'
     | '/api/public/track/$code'
+    | '/api/public/couriers/$partnerId/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -213,6 +226,7 @@ export interface RootRouteChildren {
   SolutionsRoute: typeof SolutionsRoute
   TrackRoute: typeof TrackRoute
   ApiPublicTrackCodeRoute: typeof ApiPublicTrackCodeRoute
+  ApiPublicCouriersPartnerIdWebhookRoute: typeof ApiPublicCouriersPartnerIdWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -322,6 +336,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTrackCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/couriers/$partnerId/webhook': {
+      id: '/api/public/couriers/$partnerId/webhook'
+      path: '/api/public/couriers/$partnerId/webhook'
+      fullPath: '/api/public/couriers/$partnerId/webhook'
+      preLoaderRoute: typeof ApiPublicCouriersPartnerIdWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -357,6 +378,8 @@ const rootRouteChildren: RootRouteChildren = {
   SolutionsRoute: SolutionsRoute,
   TrackRoute: TrackRoute,
   ApiPublicTrackCodeRoute: ApiPublicTrackCodeRoute,
+  ApiPublicCouriersPartnerIdWebhookRoute:
+    ApiPublicCouriersPartnerIdWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

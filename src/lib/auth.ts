@@ -24,9 +24,10 @@ export function useMe() {
     queryKey: ["me", user?.id],
     enabled: !!user,
     queryFn: async () => {
+      if (!user) return { profile: null, role: null };
       const [{ data: profile }, { data: role }] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", user!.id).maybeSingle(),
-        supabase.rpc("get_user_role", { _user_id: user!.id }),
+        supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+        supabase.rpc("get_user_role", { _user_id: user.id }),
       ]);
       return { profile: profile as Profile | null, role: (role ?? null) as AppRole | null };
     },
