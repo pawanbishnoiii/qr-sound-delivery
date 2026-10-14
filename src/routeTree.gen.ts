@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedLotsRouteImport } from './routes/_authenticated/lots'
 import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
 import { Route as AuthenticatedShipmentsIndexRouteImport } from './routes/_authenticated/shipments.index'
@@ -41,6 +42,11 @@ const TrackRoute = TrackRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLotsRoute = AuthenticatedLotsRouteImport.update({
+  id: '/lots',
+  path: '/lots',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedScanRoute = AuthenticatedScanRouteImport.update({
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/track': typeof TrackRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/lots': typeof AuthenticatedLotsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/team': typeof AuthenticatedTeamRoute
   '/shipments/$id': typeof AuthenticatedShipmentsIdRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/track': typeof TrackRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/lots': typeof AuthenticatedLotsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/team': typeof AuthenticatedTeamRoute
   '/shipments/$id': typeof AuthenticatedShipmentsIdRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/track': typeof TrackRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/lots': typeof AuthenticatedLotsRoute
   '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/_authenticated/shipments/$id': typeof AuthenticatedShipmentsIdRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/track'
     | '/dashboard'
+    | '/lots'
     | '/scan'
     | '/team'
     | '/shipments/$id'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/track'
     | '/dashboard'
+    | '/lots'
     | '/scan'
     | '/team'
     | '/shipments/$id'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/track'
     | '/_authenticated/dashboard'
+    | '/_authenticated/lots'
     | '/_authenticated/scan'
     | '/_authenticated/team'
     | '/_authenticated/shipments/$id'
@@ -176,6 +188,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/lots': {
+      id: '/_authenticated/lots'
+      path: '/lots'
+      fullPath: '/lots'
+      preLoaderRoute: typeof AuthenticatedLotsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/scan': {
       id: '/_authenticated/scan'
       path: '/scan'
@@ -209,6 +228,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedLotsRoute: typeof AuthenticatedLotsRoute
   AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
   AuthenticatedShipmentsIdRoute: typeof AuthenticatedShipmentsIdRoute
@@ -217,6 +237,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedLotsRoute: AuthenticatedLotsRoute,
   AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
   AuthenticatedShipmentsIdRoute: AuthenticatedShipmentsIdRoute,
