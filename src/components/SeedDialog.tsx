@@ -19,7 +19,7 @@ export function SeedDialog({ lotId, onClose, open }: { lotId: string | null; onC
     try {
       while (left > 0) {
         const n = Math.min(left, 1000);
-        const { data, error } = await supabase.rpc("seed_demo_orders", { _count: n, _lot: lotId ?? undefined });
+        const { data, error } = await supabase.rpc("seed_demo_orders", lotId ? { _count: n, _lot: lotId } : { _count: n });
         if (error) throw error;
         made += data ?? n; left -= n;
       }
