@@ -8,14 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Brand } from "@/components/Brand";
-import hero from "@/assets/hero-rider.jpg";
+import hero from "@/assets/bnoy-operations.jpg";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — RouteFlow OS" },
+      { title: "Sign in — Bnoy Logistics OS" },
       { name: "description", content: "Sign in to manage shipments, teams and QR scanning." },
-      { property: "og:title", content: "Sign in — RouteFlow OS" },
+      { property: "og:title", content: "Sign in — Bnoy Logistics OS" },
       { property: "og:description", content: "Sign in to manage shipments, teams and QR scanning." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -1,0 +1,12 @@
+import warehouse from '@/assets/bnoy-warehouse.jpg';
+import handover from '@/assets/bnoy-handover.jpg';
+import dispatch from '@/assets/bnoy-dispatch.jpg';
+import packaging from '@/assets/bnoy-packaging.jpg';
+import scanner from '@/assets/bnoy-scanner.jpg';
+import merchant from '@/assets/bnoy-merchant.jpg';
+import rider from '@/assets/bnoy-rider.jpg';
+import conveyor from '@/assets/bnoy-conveyor.jpg';
+import hub from '@/assets/bnoy-hub.jpg';
+import operations from '@/assets/bnoy-operations.jpg';
+import parcels from '@/assets/bnoy-parcels.jpg';
+export const photos = { warehouse, handover, dispatch, packaging, scanner, merchant, rider, conveyor, hub, operations, parcels };
