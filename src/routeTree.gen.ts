@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as IntegrationsRouteImport } from './routes/integrations'
+import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as SolutionsRouteImport } from './routes/solutions'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedLotsRouteImport } from './routes/_authenticated/lots'
@@ -34,6 +37,21 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationsRoute = IntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsRoute = SolutionsRouteImport.update({
+  id: '/solutions',
+  path: '/solutions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TrackRoute = TrackRouteImport.update({
@@ -87,6 +105,9 @@ const ApiPublicTrackCodeRoute = ApiPublicTrackCodeRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/integrations': typeof IntegrationsRoute
+  '/resources': typeof ResourcesRoute
+  '/solutions': typeof SolutionsRoute
   '/track': typeof TrackRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/lots': typeof AuthenticatedLotsRoute
@@ -100,6 +121,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/integrations': typeof IntegrationsRoute
+  '/resources': typeof ResourcesRoute
+  '/solutions': typeof SolutionsRoute
   '/track': typeof TrackRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/lots': typeof AuthenticatedLotsRoute
@@ -115,6 +139,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/integrations': typeof IntegrationsRoute
+  '/resources': typeof ResourcesRoute
+  '/solutions': typeof SolutionsRoute
   '/track': typeof TrackRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/lots': typeof AuthenticatedLotsRoute
@@ -130,6 +157,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/integrations'
+    | '/resources'
+    | '/solutions'
     | '/track'
     | '/dashboard'
     | '/lots'
@@ -143,6 +173,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/integrations'
+    | '/resources'
+    | '/solutions'
     | '/track'
     | '/dashboard'
     | '/lots'
@@ -157,6 +190,9 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/integrations'
+    | '/resources'
+    | '/solutions'
     | '/track'
     | '/_authenticated/dashboard'
     | '/_authenticated/lots'
@@ -172,6 +208,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  IntegrationsRoute: typeof IntegrationsRoute
+  ResourcesRoute: typeof ResourcesRoute
+  SolutionsRoute: typeof SolutionsRoute
   TrackRoute: typeof TrackRoute
   ApiPublicTrackCodeRoute: typeof ApiPublicTrackCodeRoute
 }
@@ -197,6 +236,27 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integrations': {
+      id: '/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof IntegrationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions': {
+      id: '/solutions'
+      path: '/solutions'
+      fullPath: '/solutions'
+      preLoaderRoute: typeof SolutionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/track': {
@@ -292,6 +352,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  IntegrationsRoute: IntegrationsRoute,
+  ResourcesRoute: ResourcesRoute,
+  SolutionsRoute: SolutionsRoute,
   TrackRoute: TrackRoute,
   ApiPublicTrackCodeRoute: ApiPublicTrackCodeRoute,
 }
