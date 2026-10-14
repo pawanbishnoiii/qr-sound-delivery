@@ -14,16 +14,204 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          parent_id: string | null
+          phone: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id: string
+          parent_id?: string | null
+          phone?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          parent_id?: string | null
+          phone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipment_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          id: string
+          note: string | null
+          shipment_id: string
+          status: Database["public"]["Enums"]["shipment_status"]
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          shipment_id: string
+          status: Database["public"]["Enums"]["shipment_status"]
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          shipment_id?: string
+          status?: Database["public"]["Enums"]["shipment_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipment_events_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipments: {
+        Row: {
+          city: string
+          cod_amount: number
+          cod_collected: boolean
+          created_at: string
+          created_by: string | null
+          delivered_at: string | null
+          distributor_id: string | null
+          id: string
+          manager_id: string | null
+          notes: string | null
+          pincode: string | null
+          receiver_address: string
+          receiver_name: string
+          receiver_phone: string
+          rider_id: string | null
+          sender_name: string
+          sender_phone: string | null
+          status: Database["public"]["Enums"]["shipment_status"]
+          tracking_code: string
+          updated_at: string
+          weight_kg: number
+        }
+        Insert: {
+          city: string
+          cod_amount?: number
+          cod_collected?: boolean
+          created_at?: string
+          created_by?: string | null
+          delivered_at?: string | null
+          distributor_id?: string | null
+          id?: string
+          manager_id?: string | null
+          notes?: string | null
+          pincode?: string | null
+          receiver_address: string
+          receiver_name: string
+          receiver_phone: string
+          rider_id?: string | null
+          sender_name: string
+          sender_phone?: string | null
+          status?: Database["public"]["Enums"]["shipment_status"]
+          tracking_code?: string
+          updated_at?: string
+          weight_kg?: number
+        }
+        Update: {
+          city?: string
+          cod_amount?: number
+          cod_collected?: boolean
+          created_at?: string
+          created_by?: string | null
+          delivered_at?: string | null
+          distributor_id?: string | null
+          id?: string
+          manager_id?: string | null
+          notes?: string | null
+          pincode?: string | null
+          receiver_address?: string
+          receiver_name?: string
+          receiver_phone?: string
+          rider_id?: string | null
+          sender_name?: string
+          sender_phone?: string | null
+          status?: Database["public"]["Enums"]["shipment_status"]
+          tracking_code?: string
+          updated_at?: string
+          weight_kg?: number
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_see_shipment: {
+        Args: { _s: Database["public"]["Tables"]["shipments"]["Row"] }
+        Returns: boolean
+      }
+      chain_role_id: {
+        Args: { _role: Database["public"]["Enums"]["app_role"]; _user: string }
+        Returns: string
+      }
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_ancestor: { Args: { _anc: string; _desc: string }; Returns: boolean }
+      track_shipment: { Args: { _code: string }; Returns: Json }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "distributor" | "manager" | "rider"
+      shipment_status:
+        | "created"
+        | "assigned"
+        | "picked_up"
+        | "in_transit"
+        | "out_for_delivery"
+        | "delivered"
+        | "failed"
+        | "returned"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +338,18 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "distributor", "manager", "rider"],
+      shipment_status: [
+        "created",
+        "assigned",
+        "picked_up",
+        "in_transit",
+        "out_for_delivery",
+        "delivered",
+        "failed",
+        "returned",
+      ],
+    },
   },
 } as const
