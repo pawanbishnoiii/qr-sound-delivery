@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/seo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -17,7 +18,7 @@ import { selectCls } from "@/lib/ui";
 import { STATUS_META, fmtDate, inr, nextStatus, type Shipment, type ShipmentStatus } from "@/lib/status";
 
 export const Route = createFileRoute("/_authenticated/shipments/$id")({
-  head: () => ({ meta: [{ title: "Shipment — RouteFlow OS" }, { name: "description", content: "Shipment details and QR label" }] }),
+  head: () => pageHead("Shipment", "Shipment details and QR label"),
   component: Detail,
 });
 
@@ -86,7 +87,7 @@ function Detail() {
       <Link to="/shipments" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Shipments</Link>
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <section className="rounded-2xl border bg-card p-5 shadow-card">
+          <section className="rounded-lg border bg-card p-5 shadow-card">
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
               <div className="min-w-0">
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">Receiver</p>
@@ -111,7 +112,7 @@ function Detail() {
             {s.notes && <p className="mt-4 rounded-lg bg-muted p-3 text-sm">{s.notes}</p>}
           </section>
 
-          <section className="rounded-2xl border bg-card p-5 shadow-card">
+          <section className="rounded-lg border bg-card p-5 shadow-card">
             <h2 className="font-bold">Actions</h2>
             <div className="mt-4 flex flex-wrap gap-2">
               {next && next !== "assigned" && !closed && (
@@ -173,10 +174,10 @@ function Detail() {
             )}
           </section>
 
-          <section className="rounded-2xl border bg-card p-5 shadow-card">
+          <section className="rounded-lg border bg-card p-5 shadow-card">
             <h2 className="font-bold">Timeline</h2>
             <ol className="relative mt-4 space-y-4 border-l pl-5">
-              {q.data!.events.map((e) => (
+              {q.data?.events.map((e) => (
                 <li key={e.id} className="relative">
                   <span className="absolute -left-[26px] top-1 h-3 w-3 rounded-full bg-gradient-brand ring-4 ring-card" />
                   <p className="text-sm font-semibold">{e.note ?? STATUS_META[e.status as ShipmentStatus].label}</p>
@@ -187,10 +188,10 @@ function Detail() {
           </section>
         </div>
 
-        <aside className="h-fit rounded-2xl border bg-card p-5 text-center shadow-card">
+        <aside className="h-fit rounded-lg border bg-card p-5 text-center shadow-card">
           <p className="text-xs uppercase tracking-wide text-muted-foreground">QR & barcode label</p>
-          <div className="mx-auto mt-3 w-fit rounded-xl border p-3"><QrCode value={trackUrl(s.tracking_code)} size={200} /></div>
-          <div className="mt-4 rounded-xl border bg-background p-3"><Barcode value={s.tracking_code} /></div>
+          <div className="mx-auto mt-3 w-fit rounded-md border p-3"><QrCode value={trackUrl(s.tracking_code)} size={200} /></div>
+          <div className="mt-4 rounded-md border bg-background p-3"><Barcode value={s.tracking_code} /></div>
           <p className="mt-2 font-mono text-lg font-bold">{s.tracking_code}</p>
           <p className="break-all text-[11px] text-muted-foreground">Order ID {s.id}</p>
           {s.is_demo && <span className="mt-2 inline-block rounded-full bg-warning/30 px-2 py-0.5 text-xs font-semibold">Demo order</span>}

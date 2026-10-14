@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Package, Truck, CheckCircle2, IndianRupee, ScanLine, Plus, Users } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -8,7 +9,7 @@ import { useShipments } from "@/lib/shipments";
 import { STATUS_FLOW, STATUS_META, fmtDate, inr } from "@/lib/status";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — RouteFlow OS" }, { name: "description", content: "Operations overview" }] }),
+  head: () => pageHead("Dashboard", "Operations overview"),
   component: Dashboard,
 });
 
@@ -42,8 +43,8 @@ function Dashboard() {
     >
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
         {stats.map((s, i) => (
-          <div key={s.label} className="rounded-2xl border bg-card p-4 shadow-card animate-rise sm:p-5" style={{ animationDelay: `${i * 60}ms` }}>
-            <span className={`grid h-10 w-10 place-items-center rounded-xl ${s.tone}`}><s.icon className="h-5 w-5" /></span>
+          <div key={s.label} className="rounded-lg border bg-card p-4 shadow-card animate-rise sm:p-5" style={{ animationDelay: `${i * 60}ms` }}>
+            <span className={`grid h-10 w-10 place-items-center rounded-md ${s.tone}`}><s.icon className="h-5 w-5" /></span>
             <p className="mt-4 font-display text-2xl font-bold tabular sm:text-3xl">{isLoading ? "…" : s.value}</p>
             <p className="text-xs text-muted-foreground sm:text-sm">{s.label}</p>
           </div>
@@ -51,7 +52,7 @@ function Dashboard() {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <section className="rounded-2xl border bg-card p-5 shadow-card lg:col-span-2">
+        <section className="rounded-lg border bg-card p-5 shadow-card lg:col-span-2">
           <div className="flex items-center justify-between">
             <h2 className="font-bold">{role === "rider" ? "My deliveries" : "Recent shipments"}</h2>
             <Link to="/shipments" className="text-sm font-semibold text-primary">View all</Link>
@@ -76,14 +77,14 @@ function Dashboard() {
         </section>
 
         <section className="space-y-6">
-          <div className="rounded-2xl bg-gradient-hero p-5 text-navy-foreground shadow-card">
+          <div className="rounded-lg bg-gradient-hero p-5 text-navy-foreground shadow-card">
             <p className="text-sm opacity-80">Delivery success rate</p>
             <p className="mt-1 font-display text-4xl font-bold tabular">{rate}%</p>
             <div className="mt-4 h-2 overflow-hidden rounded-full bg-navy-foreground/15">
               <div className="h-full rounded-full bg-lime transition-all" style={{ width: `${rate}%` }} />
             </div>
           </div>
-          <div className="rounded-2xl border bg-card p-5 shadow-card">
+          <div className="rounded-lg border bg-card p-5 shadow-card">
             <h2 className="font-bold">Pipeline</h2>
             <ul className="mt-3 space-y-2.5">
               {STATUS_FLOW.map((st) => {
@@ -101,8 +102,8 @@ function Dashboard() {
             </ul>
           </div>
           {role !== "rider" && (
-            <Link to="/team" className="flex items-center gap-4 rounded-2xl border bg-card p-5 shadow-card hover:border-primary">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-lime text-navy"><Users className="h-5 w-5" /></span>
+            <Link to="/team" className="flex items-center gap-4 rounded-lg border bg-card p-5 shadow-card hover:border-primary">
+              <span className="grid h-10 w-10 place-items-center rounded-md bg-lime text-navy"><Users className="h-5 w-5" /></span>
               <div>
                 <p className="font-bold tabular">{Math.max(team.length - 1, 0)} team members</p>
                 <p className="text-xs text-muted-foreground">{team.filter((t) => t.role === "rider").length} riders</p>

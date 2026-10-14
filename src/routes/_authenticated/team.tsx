@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -15,7 +16,7 @@ import { selectCls } from "@/lib/ui";
 import { ROLE_LABEL, ROLE_RANK, creatableRoles, type AppRole } from "@/lib/status";
 
 export const Route = createFileRoute("/_authenticated/team")({
-  head: () => ({ meta: [{ title: "Team — RouteFlow OS" }, { name: "description", content: "Distributors, managers and riders" }] }),
+  head: () => pageHead("Team", "Distributors, managers and riders"),
   component: TeamPage,
 });
 
@@ -66,9 +67,9 @@ function TeamPage() {
     const editable = canManage && m.id !== user?.id && m.role !== "admin";
     return (
       <li>
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border bg-card p-3 shadow-card" style={{ marginLeft: Math.min(depth, 4) * 16 }}>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-md border bg-card p-3 shadow-card" style={{ marginLeft: Math.min(depth, 4) * 16 }}>
           <div className="flex min-w-0 items-center gap-3">
-            <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${m.role ? TONE[m.role] : "bg-muted"}`}><Icon className="h-5 w-5" /></span>
+            <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-md ${m.role ? TONE[m.role] : "bg-muted"}`}><Icon className="h-5 w-5" /></span>
             <div className="min-w-0">
               <p className="truncate font-semibold">{m.full_name}{m.id === user?.id && <span className="ml-2 text-xs text-muted-foreground">(you)</span>}</p>
               <p className="truncate text-xs text-muted-foreground">{m.role ? ROLE_LABEL[m.role] : "No role"} · {m.email}{m.phone ? ` · ${m.phone}` : ""}</p>
@@ -100,7 +101,7 @@ function TeamPage() {
         {counts.map(({ r, n }) => {
           const Icon = ICON[r];
           return (
-            <div key={r} className="rounded-2xl border bg-card p-4 shadow-card">
+            <div key={r} className="rounded-lg border bg-card p-4 shadow-card">
               <span className={`grid h-9 w-9 place-items-center rounded-lg ${TONE[r]}`}><Icon className="h-4 w-4" /></span>
               <p className="mt-3 font-display text-2xl font-bold tabular">{n}</p>
               <p className="text-xs text-muted-foreground">{ROLE_LABEL[r]}s</p>
@@ -112,7 +113,7 @@ function TeamPage() {
       {isLoading ? <Loader2 className="animate-spin" /> : (
         <ul className="space-y-2">{(children.get(null) ?? []).map((m) => <Node key={m.id} m={m} depth={0} />)}</ul>
       )}
-      {canManage && <AddDialog open={open} onClose={() => setOpen(false)} team={team} myRole={role!} myId={user!.id} defaultParent={parentFor} />}
+      {canManage && role && user && <AddDialog open={open} onClose={() => setOpen(false)} team={team} myRole={role} myId={user.id} defaultParent={parentFor} />}
     </AppShell>
   );
 }
@@ -161,7 +162,7 @@ function AddDialog({ open, onClose, team, myRole, myId, defaultParent }: {
             {roles.map((r) => {
               const Icon = ICON[r];
               return (
-                <button type="button" key={r} onClick={() => setRole(r)} className={`flex flex-col items-center gap-1 rounded-xl border p-3 text-xs font-semibold ${role === r ? "border-primary bg-accent text-primary" : ""}`}>
+                <button type="button" key={r} onClick={() => setRole(r)} className={`flex flex-col items-center gap-1 rounded-md border p-3 text-xs font-semibold ${role === r ? "border-primary bg-accent text-primary" : ""}`}>
                   <Icon className="h-5 w-5" />{ROLE_LABEL[r]}
                 </button>
               );

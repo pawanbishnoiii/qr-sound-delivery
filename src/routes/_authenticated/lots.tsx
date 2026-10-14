@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -17,7 +18,7 @@ import { SeedDialog } from "@/components/SeedDialog";
 import { fmtDate } from "@/lib/status";
 
 export const Route = createFileRoute("/_authenticated/lots")({
-  head: () => ({ meta: [{ title: "Lots & sorting — RouteFlow OS" }, { name: "description", content: "Parcel lots sent to managers for rider sorting" }] }),
+  head: () => pageHead("Lots & sorting", "Parcel lots sent to managers for rider sorting"),
   component: LotsPage,
 });
 
@@ -47,7 +48,7 @@ function LotsPage() {
       title="Lots & sorting"
       actions={canManage && <Button variant="hero" size="sm" onClick={() => setOpen(true)}><Plus /> <span className="hidden sm:inline">New lot</span></Button>}
     >
-      <div className="mb-6 rounded-2xl border bg-card p-5 shadow-card">
+      <div className="mb-6 rounded-lg border bg-card p-5 shadow-card">
         <p className="text-sm text-muted-foreground">
           {isRider
             ? "Your manager's lots are listed below. Tap “Start sorting”, then scan each parcel you will deliver — it is added to your account."
@@ -56,7 +57,7 @@ function LotsPage() {
       </div>
 
       {lots.isLoading ? <Loader2 className="animate-spin" /> : (lots.data ?? []).length === 0 ? (
-        <div className="rounded-2xl border border-dashed bg-card py-16 text-center">
+        <div className="rounded-lg border border-dashed bg-card py-16 text-center">
           <Layers className="mx-auto h-10 w-10 text-muted-foreground" />
           <p className="mt-3 font-semibold">No lots yet</p>
           {canManage && <Button className="mt-4" variant="hero" onClick={() => setOpen(true)}><Plus /> Create a lot</Button>}
@@ -69,7 +70,7 @@ function LotsPage() {
             const mine = items.filter((s) => s.rider_id === user?.id).length;
             const pct = items.length ? Math.round((claimed / items.length) * 100) : 0;
             return (
-              <div key={l.id} className="flex flex-col rounded-2xl border bg-card p-5 shadow-card">
+              <div key={l.id} className="flex flex-col rounded-lg border bg-card p-5 shadow-card">
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
                   <div className="min-w-0">
                     <p className="truncate font-mono text-sm font-bold">{l.code}</p>
@@ -106,14 +107,14 @@ function LotsPage() {
         </div>
       )}
 
-      {canManage && <NewLot open={open} onClose={() => setOpen(false)} managers={managers} myId={user!.id} isManager={role === "manager"} />}
+      {canManage && user && <NewLot open={open} onClose={() => setOpen(false)} managers={managers} myId={user.id} isManager={role === "manager"} />}
       {canManage && <SeedDialog lotId={seedLot} onClose={() => setSeedLot(null)} />}
     </AppShell>
   );
 }
 
 function Stat({ n, l }: { n: number; l: string }) {
-  return <div className="rounded-xl bg-muted p-2"><p className="font-display text-xl font-bold tabular">{n}</p><p className="text-[11px] text-muted-foreground">{l}</p></div>;
+  return <div className="rounded-md bg-muted p-2"><p className="font-display text-xl font-bold tabular">{n}</p><p className="text-[11px] text-muted-foreground">{l}</p></div>;
 }
 
 function NewLot({ open, onClose, managers, myId, isManager }: { open: boolean; onClose: () => void; managers: { id: string; full_name: string }[]; myId: string; isManager: boolean }) {
