@@ -1,0 +1,97 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { z } from "zod";
+import { CheckCircle2, Circle, Search, PackageX } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Brand } from "@/components/Brand";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { StatusBadge } from "@/components/StatusBadge";
+import { STATUS_FLOW, STATUS_META, fmtDate, type ShipmentStatus } from "@/lib/status";
+
+type Tracked = {
+  tracking_code: string; status: ShipmentStatus; city: string; receiver: string;
+  created_at: string; updated_at: string; delivered_at: string | null;
+  events: { status: ShipmentStatus; at: string }[];
+};
+
+export const Route = createFileRoute("/track")({
+  validateSearch: z.object({ code: z.string().optional() }),
+  head: () => ({
+    meta: [
+      { title: "Track your parcel — RouteFlow OS" },
+      { name: "description", content: "Enter your tracking number or scan the QR on your parcel to see live status." },
+      { property: "og:title", content: "Track your parcel — RouteFlow OS" },
+      { property: "og:description", content: "Live shipment status from pickup to doorstep." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: TrackPage,
+});
+
+function TrackPage() {
+  const { code } = Route.useSearch();
+  const navigate = useNavigate({ from: "/track" });
+  const [input, setInput] = useState(code ?? "");
+  const q = useQuery({
+    queryKey: ["track", code],
+    enabled: !!code,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("track_shipment", { _code: code! });
+      if (error) throw error;
+      return data as unknown as Tracked | null;
+    },
+  });
+  const t = q.data;
+  const reached = new Map(t?.events.map((e) => [e.status, e.at]) ?? []);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="mx-auto flex max-w-5xl items-center justify-between px-4 py-5 sm:px-6"><Brand /></header>
+      <main className="mx-auto max-w-2xl px-4 pb-16 sm:px-6">
+        <h1 className="text-3xl font-bold sm:text-4xl">Track your parcel</h1>
+        <form
+          className="mt-6 flex gap-2"
+          onSubmit={(e) => { e.preventDefault(); navigate({ search: { code: input.trim() || undefined } }); }}
+        >
+          <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="e.g. RF261014AB12C" className="h-12 font-mono uppercase" maxLength={40} />
+          <Button type="submit" variant="hero" className="h-12 px-6"><Search /> Track</Button>
+        </form>
+
+        {q.isLoading && <div className="mt-8 h-48 animate-pulse rounded-2xl bg-muted" />}
+        {code && !q.isLoading && !t && (
+          <div className="mt-8 rounded-2xl border bg-card p-8 text-center shadow-card">
+            <PackageX className="mx-auto h-10 w-10 text-muted-foreground" />
+            <p className="mt-3 font-semibold">No shipment found for “{code}”</p>
+            <p className="text-sm text-muted-foreground">Check the code on your parcel label.</p>
+          </div>
+        )}
+        {t && (
+          <div className="mt-8 rounded-2xl border bg-card p-6 shadow-card animate-rise">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+              <div className="min-w-0">
+                <p className="truncate font-mono text-lg font-bold">{t.tracking_code}</p>
+                <p className="text-sm text-muted-foreground">For {t.receiver} · {t.city}</p>
+              </div>
+              <StatusBadge status={t.status} />
+            </div>
+            <ol className="mt-6 space-y-4">
+              {STATUS_FLOW.map((s) => {
+                const at = reached.get(s);
+                return (
+                  <li key={s} className="flex items-center gap-3">
+                    {at ? <CheckCircle2 className="h-5 w-5 shrink-0 text-success" /> : <Circle className="h-5 w-5 shrink-0 text-border" />}
+                    <span className={`flex-1 text-sm ${at ? "font-semibold" : "text-muted-foreground"}`}>{STATUS_META[s].label}</span>
+                    <span className="text-xs text-muted-foreground tabular">{at ? fmtDate(at) : ""}</span>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
