@@ -23,6 +23,7 @@ export const STATUS_META: Record<ShipmentStatus, { label: string; tone: string }
   delivered: { label: "Delivered", tone: "bg-success/20 text-success" },
   failed: { label: "Failed", tone: "bg-destructive/15 text-destructive" },
   returned: { label: "Returned", tone: "bg-coral/20 text-coral" },
+  cancelled: { label: "Cancelled", tone: "bg-destructive/10 text-destructive" },
 };
 
 export const ROLE_LABEL: Record<AppRole, string> = {

@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          key_hash: string
+          last_used_at: string | null
+          name: string
+          prefix: string
+          revoked_at: string | null
+          scopes: string[]
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          key_hash: string
+          last_used_at?: string | null
+          name: string
+          prefix: string
+          revoked_at?: string | null
+          scopes?: string[]
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          key_hash?: string
+          last_used_at?: string | null
+          name?: string
+          prefix?: string
+          revoked_at?: string | null
+          scopes?: string[]
+        }
+        Relationships: []
+      }
       courier_partners: {
         Row: {
           account_reference: string
@@ -242,6 +278,144 @@ export type Database = {
         }
         Relationships: []
       }
+      return_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          id: string
+          lat: number | null
+          lng: number | null
+          note: string | null
+          return_id: string
+          status: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          note?: string | null
+          return_id: string
+          status: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          note?: string | null
+          return_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "return_events_return_id_fkey"
+            columns: ["return_id"]
+            isOneToOne: false
+            referencedRelation: "return_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      return_photos: {
+        Row: {
+          accuracy_m: number | null
+          captured_by: string | null
+          created_at: string
+          id: string
+          lat: number | null
+          lng: number | null
+          path: string
+          return_id: string
+        }
+        Insert: {
+          accuracy_m?: number | null
+          captured_by?: string | null
+          created_at?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          path: string
+          return_id: string
+        }
+        Update: {
+          accuracy_m?: number | null
+          captured_by?: string | null
+          created_at?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          path?: string
+          return_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "return_photos_return_id_fkey"
+            columns: ["return_id"]
+            isOneToOne: false
+            referencedRelation: "return_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      return_requests: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string
+          last_lat: number | null
+          last_lng: number | null
+          last_location_at: string | null
+          pickup_address: string | null
+          reason: string
+          rider_id: string | null
+          shipment_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind: string
+          last_lat?: number | null
+          last_lng?: number | null
+          last_location_at?: string | null
+          pickup_address?: string | null
+          reason: string
+          rider_id?: string | null
+          shipment_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          last_lat?: number | null
+          last_lng?: number | null
+          last_location_at?: string | null
+          pickup_address?: string | null
+          reason?: string
+          rider_id?: string | null
+          shipment_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "return_requests_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shipment_events: {
         Row: {
           actor_id: string | null
@@ -406,11 +580,89 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_deliveries: {
+        Row: {
+          created_at: string
+          endpoint_id: string
+          error: string | null
+          event: string
+          id: string
+          ok: boolean
+          status_code: number | null
+        }
+        Insert: {
+          created_at?: string
+          endpoint_id: string
+          error?: string | null
+          event: string
+          id?: string
+          ok?: boolean
+          status_code?: number | null
+        }
+        Update: {
+          created_at?: string
+          endpoint_id?: string
+          error?: string | null
+          event?: string
+          id?: string
+          ok?: boolean
+          status_code?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_deliveries_endpoint_id_fkey"
+            columns: ["endpoint_id"]
+            isOneToOne: false
+            referencedRelation: "webhook_endpoints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_endpoints: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          events: string[]
+          id: string
+          last_delivery_at: string | null
+          last_status: number | null
+          name: string
+          secret: string
+          url: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          events?: string[]
+          id?: string
+          last_delivery_at?: string | null
+          last_status?: number | null
+          name: string
+          secret: string
+          url: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          events?: string[]
+          id?: string
+          last_delivery_at?: string | null
+          last_status?: number | null
+          name?: string
+          secret?: string
+          url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      can_see_return: { Args: { _return_id: string }; Returns: boolean }
       can_see_shipment: {
         Args: { _s: Database["public"]["Tables"]["shipments"]["Row"] }
         Returns: boolean
@@ -534,6 +786,7 @@ export type Database = {
         | "delivered"
         | "failed"
         | "returned"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -671,6 +924,7 @@ export const Constants = {
         "delivered",
         "failed",
         "returned",
+        "cancelled",
       ],
     },
   },

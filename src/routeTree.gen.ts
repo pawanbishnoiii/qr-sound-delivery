@@ -17,13 +17,16 @@ import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as SolutionsRouteImport } from './routes/solutions'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDevelopersRouteImport } from './routes/_authenticated/developers'
 import { Route as AuthenticatedLotsRouteImport } from './routes/_authenticated/lots'
 import { Route as AuthenticatedProvidersRouteImport } from './routes/_authenticated/providers'
+import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
 import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
 import { Route as AuthenticatedShipmentsIndexRouteImport } from './routes/_authenticated/shipments.index'
 import { Route as AuthenticatedShipmentsIdRouteImport } from './routes/_authenticated/shipments.$id'
 import { Route as ApiPublicTrackCodeRouteImport } from './routes/api/public/track.$code'
+import { Route as ApiPublicV1ShipmentsRouteImport } from './routes/api/public/v1/shipments'
 import { Route as ApiPublicCouriersPartnerIdWebhookRouteImport } from './routes/api/public/couriers.$partnerId.webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -65,6 +68,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDevelopersRoute = AuthenticatedDevelopersRouteImport.update({
+  id: '/developers',
+  path: '/developers',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLotsRoute = AuthenticatedLotsRouteImport.update({
   id: '/lots',
   path: '/lots',
@@ -73,6 +81,11 @@ const AuthenticatedLotsRoute = AuthenticatedLotsRouteImport.update({
 const AuthenticatedProvidersRoute = AuthenticatedProvidersRouteImport.update({
   id: '/providers',
   path: '/providers',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReturnsRoute = AuthenticatedReturnsRouteImport.update({
+  id: '/returns',
+  path: '/returns',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedScanRoute = AuthenticatedScanRouteImport.update({
@@ -102,6 +115,11 @@ const ApiPublicTrackCodeRoute = ApiPublicTrackCodeRouteImport.update({
   path: '/api/public/track/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicV1ShipmentsRoute = ApiPublicV1ShipmentsRouteImport.update({
+  id: '/api/public/v1/shipments',
+  path: '/api/public/v1/shipments',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCouriersPartnerIdWebhookRoute =
   ApiPublicCouriersPartnerIdWebhookRouteImport.update({
     id: '/api/public/couriers/$partnerId/webhook',
@@ -117,13 +135,16 @@ export interface FileRoutesByFullPath {
   '/solutions': typeof SolutionsRoute
   '/track': typeof TrackRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/developers': typeof AuthenticatedDevelopersRoute
   '/lots': typeof AuthenticatedLotsRoute
   '/providers': typeof AuthenticatedProvidersRoute
+  '/returns': typeof AuthenticatedReturnsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/team': typeof AuthenticatedTeamRoute
   '/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/shipments/': typeof AuthenticatedShipmentsIndexRoute
   '/api/public/track/$code': typeof ApiPublicTrackCodeRoute
+  '/api/public/v1/shipments': typeof ApiPublicV1ShipmentsRoute
   '/api/public/couriers/$partnerId/webhook': typeof ApiPublicCouriersPartnerIdWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -134,13 +155,16 @@ export interface FileRoutesByTo {
   '/solutions': typeof SolutionsRoute
   '/track': typeof TrackRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/developers': typeof AuthenticatedDevelopersRoute
   '/lots': typeof AuthenticatedLotsRoute
   '/providers': typeof AuthenticatedProvidersRoute
+  '/returns': typeof AuthenticatedReturnsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/team': typeof AuthenticatedTeamRoute
   '/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/shipments': typeof AuthenticatedShipmentsIndexRoute
   '/api/public/track/$code': typeof ApiPublicTrackCodeRoute
+  '/api/public/v1/shipments': typeof ApiPublicV1ShipmentsRoute
   '/api/public/couriers/$partnerId/webhook': typeof ApiPublicCouriersPartnerIdWebhookRoute
 }
 export interface FileRoutesById {
@@ -153,13 +177,16 @@ export interface FileRoutesById {
   '/solutions': typeof SolutionsRoute
   '/track': typeof TrackRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/developers': typeof AuthenticatedDevelopersRoute
   '/_authenticated/lots': typeof AuthenticatedLotsRoute
   '/_authenticated/providers': typeof AuthenticatedProvidersRoute
+  '/_authenticated/returns': typeof AuthenticatedReturnsRoute
   '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/_authenticated/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/_authenticated/shipments/': typeof AuthenticatedShipmentsIndexRoute
   '/api/public/track/$code': typeof ApiPublicTrackCodeRoute
+  '/api/public/v1/shipments': typeof ApiPublicV1ShipmentsRoute
   '/api/public/couriers/$partnerId/webhook': typeof ApiPublicCouriersPartnerIdWebhookRoute
 }
 export interface FileRouteTypes {
@@ -172,13 +199,16 @@ export interface FileRouteTypes {
     | '/solutions'
     | '/track'
     | '/dashboard'
+    | '/developers'
     | '/lots'
     | '/providers'
+    | '/returns'
     | '/scan'
     | '/team'
     | '/shipments/$id'
     | '/shipments/'
     | '/api/public/track/$code'
+    | '/api/public/v1/shipments'
     | '/api/public/couriers/$partnerId/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -189,13 +219,16 @@ export interface FileRouteTypes {
     | '/solutions'
     | '/track'
     | '/dashboard'
+    | '/developers'
     | '/lots'
     | '/providers'
+    | '/returns'
     | '/scan'
     | '/team'
     | '/shipments/$id'
     | '/shipments'
     | '/api/public/track/$code'
+    | '/api/public/v1/shipments'
     | '/api/public/couriers/$partnerId/webhook'
   id:
     | '__root__'
@@ -207,13 +240,16 @@ export interface FileRouteTypes {
     | '/solutions'
     | '/track'
     | '/_authenticated/dashboard'
+    | '/_authenticated/developers'
     | '/_authenticated/lots'
     | '/_authenticated/providers'
+    | '/_authenticated/returns'
     | '/_authenticated/scan'
     | '/_authenticated/team'
     | '/_authenticated/shipments/$id'
     | '/_authenticated/shipments/'
     | '/api/public/track/$code'
+    | '/api/public/v1/shipments'
     | '/api/public/couriers/$partnerId/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -226,6 +262,7 @@ export interface RootRouteChildren {
   SolutionsRoute: typeof SolutionsRoute
   TrackRoute: typeof TrackRoute
   ApiPublicTrackCodeRoute: typeof ApiPublicTrackCodeRoute
+  ApiPublicV1ShipmentsRoute: typeof ApiPublicV1ShipmentsRoute
   ApiPublicCouriersPartnerIdWebhookRoute: typeof ApiPublicCouriersPartnerIdWebhookRoute
 }
 
@@ -287,6 +324,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/developers': {
+      id: '/_authenticated/developers'
+      path: '/developers'
+      fullPath: '/developers'
+      preLoaderRoute: typeof AuthenticatedDevelopersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lots': {
       id: '/_authenticated/lots'
       path: '/lots'
@@ -299,6 +343,13 @@ declare module '@tanstack/react-router' {
       path: '/providers'
       fullPath: '/providers'
       preLoaderRoute: typeof AuthenticatedProvidersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/returns': {
+      id: '/_authenticated/returns'
+      path: '/returns'
+      fullPath: '/returns'
+      preLoaderRoute: typeof AuthenticatedReturnsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/scan': {
@@ -336,6 +387,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTrackCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/v1/shipments': {
+      id: '/api/public/v1/shipments'
+      path: '/api/public/v1/shipments'
+      fullPath: '/api/public/v1/shipments'
+      preLoaderRoute: typeof ApiPublicV1ShipmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/couriers/$partnerId/webhook': {
       id: '/api/public/couriers/$partnerId/webhook'
       path: '/api/public/couriers/$partnerId/webhook'
@@ -348,8 +406,10 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDevelopersRoute: typeof AuthenticatedDevelopersRoute
   AuthenticatedLotsRoute: typeof AuthenticatedLotsRoute
   AuthenticatedProvidersRoute: typeof AuthenticatedProvidersRoute
+  AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
   AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
   AuthenticatedShipmentsIdRoute: typeof AuthenticatedShipmentsIdRoute
@@ -358,8 +418,10 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDevelopersRoute: AuthenticatedDevelopersRoute,
   AuthenticatedLotsRoute: AuthenticatedLotsRoute,
   AuthenticatedProvidersRoute: AuthenticatedProvidersRoute,
+  AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
   AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
   AuthenticatedShipmentsIdRoute: AuthenticatedShipmentsIdRoute,
@@ -378,6 +440,7 @@ const rootRouteChildren: RootRouteChildren = {
   SolutionsRoute: SolutionsRoute,
   TrackRoute: TrackRoute,
   ApiPublicTrackCodeRoute: ApiPublicTrackCodeRoute,
+  ApiPublicV1ShipmentsRoute: ApiPublicV1ShipmentsRoute,
   ApiPublicCouriersPartnerIdWebhookRoute:
     ApiPublicCouriersPartnerIdWebhookRoute,
 }

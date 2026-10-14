@@ -14,7 +14,10 @@ type Tracked = {
   tracking_code: string; status: ShipmentStatus; city: string; receiver: string;
   created_at: string; updated_at: string; delivered_at: string | null;
   events: { status: ShipmentStatus; at: string }[];
+  returns?: { kind: string; status: string; requested_at: string; events: { status: string; at: string }[] }[];
 };
+const RET: Record<string, string> = { requested: "Return requested", pickup_assigned: "Pickup rider assigned", picked_up: "Picked up from customer", in_transit: "Returning to hub", received: "Received at hub", cancelled: "Return closed" };
+const KIND: Record<string, string> = { customer_return: "Return pickup", rto: "Return to origin", cancellation: "Cancellation" };
 
 export const Route = createFileRoute("/track")({
   validateSearch: z.object({ code: z.string().optional() }),
@@ -91,6 +94,16 @@ function TrackPage() {
                 );
               })}
             </ol>
+            {(t.returns ?? []).map((r, i) => (
+              <div key={i} className="mt-6 border-t pt-4">
+                <p className="text-sm font-semibold">{KIND[r.kind] ?? "Return"}</p>
+                <ol className="mt-3 space-y-2">
+                  {r.events.map((e, j) => (
+                    <li key={j} className="flex items-center gap-3 text-sm"><CheckCircle2 className="h-4 w-4 shrink-0 text-coral" /><span className="flex-1">{RET[e.status] ?? e.status}</span><span className="text-xs text-muted-foreground tabular">{fmtDate(e.at)}</span></li>
+                  ))}
+                </ol>
+              </div>
+            ))}
           </div>
         )}
         <div className="mt-10 rounded-2xl bg-navy p-5 text-navy-foreground">
