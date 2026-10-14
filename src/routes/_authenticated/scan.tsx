@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/seo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -21,7 +22,7 @@ type Mode = (typeof MODE_IDS)[number];
 
 export const Route = createFileRoute("/_authenticated/scan")({
   validateSearch: z.object({ mode: z.enum(MODE_IDS).optional(), lot: z.string().optional() }),
-  head: () => ({ meta: [{ title: "Scan parcels — RouteFlow OS" }, { name: "description", content: "Scan QR codes and barcodes with your camera" }] }),
+  head: () => pageHead("Scan parcels", "Scan QR codes and barcodes with your camera"),
   component: ScanPage,
 });
 
@@ -138,18 +139,18 @@ function ScanPage() {
         </div>
 
         <div className="min-w-0 space-y-4">
-          <div className="flex items-center justify-between rounded-2xl bg-gradient-hero p-4 text-navy-foreground">
+          <div className="flex items-center justify-between rounded-lg bg-gradient-hero p-4 text-navy-foreground">
             <div><p className="text-xs opacity-75">Mode</p><p className="font-display text-lg font-bold">{LABEL[mode]}</p></div>
             <div className="text-right"><p className="text-xs opacity-75">Successful scans</p><p className="font-display text-2xl font-bold tabular">{okCount}</p></div>
           </div>
           {latest ? (
-            <div key={latest.at} className={`rounded-2xl border-2 p-5 shadow-card animate-rise ${latest.ok ? "border-success bg-success/10" : "border-destructive bg-destructive/10"}`}>
+            <div key={latest.at} className={`rounded-lg border-2 p-5 shadow-card animate-rise ${latest.ok ? "border-success bg-success/10" : "border-destructive bg-destructive/10"}`}>
               <div className="flex items-center gap-3">
                 {latest.ok ? <CheckCircle2 className="h-8 w-8 shrink-0 text-success" /> : <XCircle className="h-8 w-8 shrink-0 text-destructive" />}
                 <div className="min-w-0"><p className="truncate font-mono text-lg font-bold">{latest.code}</p><p className="text-sm">{latest.msg}</p></div>
               </div>
               {latest.shipment && (
-                <Link to="/shipments/$id" params={{ id: latest.shipment.id }} className="mt-4 block rounded-xl bg-card p-4">
+                <Link to="/shipments/$id" params={{ id: latest.shipment.id }} className="mt-4 block rounded-md bg-card p-4">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2"><p className="truncate font-semibold">{latest.shipment.receiver_name}</p><StatusBadge status={latest.shipment.status} /></div>
                   <p className="truncate text-sm text-muted-foreground">{latest.shipment.receiver_address}, {latest.shipment.city}</p>
                   {Number(latest.shipment.cod_amount) > 0 && <p className="mt-1 text-sm font-bold text-coral tabular">Collect COD ₹{Number(latest.shipment.cod_amount).toLocaleString("en-IN")}</p>}
@@ -157,12 +158,12 @@ function ScanPage() {
               )}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed bg-card p-8 text-center text-sm text-muted-foreground">
+            <div className="rounded-lg border border-dashed bg-card p-8 text-center text-sm text-muted-foreground">
               Point the camera at a parcel label. Each successful scan plays a chime; problems play a buzz.
             </div>
           )}
           {log.length > 1 && (
-            <div className="rounded-2xl border bg-card p-4 shadow-card">
+            <div className="rounded-lg border bg-card p-4 shadow-card">
               <p className="mb-2 text-sm font-bold">Scan history</p>
               <ul className="divide-y text-sm">
                 {log.slice(1).map((r) => (

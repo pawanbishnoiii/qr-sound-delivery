@@ -20,9 +20,9 @@ export const Route = createFileRoute("/track")({
   validateSearch: z.object({ code: z.string().optional() }),
   head: () => ({
     meta: [
-      { title: "Track your parcel — RouteFlow OS" },
+      { title: "Track your parcel — Bnoy Logistics OS" },
       { name: "description", content: "Enter your tracking number or scan the QR on your parcel to see live status." },
-      { property: "og:title", content: "Track your parcel — RouteFlow OS" },
+      { property: "og:title", content: "Track your parcel — Bnoy Logistics OS" },
       { property: "og:description", content: "Live shipment status from pickup to doorstep." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -39,7 +39,8 @@ function TrackPage() {
     queryKey: ["track", code],
     enabled: !!code,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("track_shipment", { _code: code! });
+      if (!code) return null;
+      const { data, error } = await supabase.rpc("track_shipment", { _code: code });
       if (error) throw error;
       return data as unknown as Tracked | null;
     },
@@ -56,12 +57,13 @@ function TrackPage() {
           className="mt-6 flex gap-2"
           onSubmit={(e) => { e.preventDefault(); navigate({ search: { code: input.trim() || undefined } }); }}
         >
-          <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Tracking code or order ID" className="h-12 font-mono uppercase" maxLength={40} />
+          <Input value={input} onChange={(e) => setInput(e.target.value)} aria-label="Tracking code or order ID" placeholder="Tracking code or order ID" className="h-12 font-mono uppercase" maxLength={120} />
           <Button type="submit" variant="hero" className="h-12 px-6"><Search /> Track</Button>
         </form>
 
         {q.isLoading && <div className="mt-8 h-48 animate-pulse rounded-2xl bg-muted" />}
-        {code && !q.isLoading && !t && (
+        {q.error && <div role="alert" className="mt-8 border p-6"><p>Tracking is temporarily unavailable.</p><Button variant="outline" className="mt-3" onClick={()=>q.refetch()}>Retry</Button></div>}
+        {code && !q.isLoading && !q.error && !t && (
           <div className="mt-8 rounded-2xl border bg-card p-8 text-center shadow-card">
             <PackageX className="mx-auto h-10 w-10 text-muted-foreground" />
             <p className="mt-3 font-semibold">No shipment found for “{code}”</p>

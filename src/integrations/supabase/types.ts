@@ -14,6 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
+      courier_partners: {
+        Row: {
+          account_reference: string
+          adapter: string
+          connection_status: string
+          created_at: string
+          created_by: string
+          enabled: boolean
+          id: string
+          last_error: string | null
+          last_sync_at: string | null
+          name: string
+        }
+        Insert: {
+          account_reference?: string
+          adapter: string
+          connection_status?: string
+          created_at?: string
+          created_by?: string
+          enabled?: boolean
+          id?: string
+          last_error?: string | null
+          last_sync_at?: string | null
+          name: string
+        }
+        Update: {
+          account_reference?: string
+          adapter?: string
+          connection_status?: string
+          created_at?: string
+          created_by?: string
+          enabled?: boolean
+          id?: string
+          last_error?: string | null
+          last_sync_at?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
+      integration_events: {
+        Row: {
+          created_at: string
+          event_key: string
+          event_type: string
+          id: string
+          message: string
+          outcome: string
+          partner_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_key: string
+          event_type: string
+          id?: string
+          message?: string
+          outcome: string
+          partner_id: string
+        }
+        Update: {
+          created_at?: string
+          event_key?: string
+          event_type?: string
+          id?: string
+          message?: string
+          outcome?: string
+          partner_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_events_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "courier_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lots: {
         Row: {
           code: string
@@ -48,6 +125,51 @@ export type Database = {
             columns: ["manager_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_orders: {
+        Row: {
+          external_order_id: string
+          id: string
+          order_data: Json
+          partner_id: string
+          received_at: string
+          shipment_id: string | null
+          source: string
+        }
+        Insert: {
+          external_order_id: string
+          id?: string
+          order_data?: Json
+          partner_id: string
+          received_at?: string
+          shipment_id?: string | null
+          source?: string
+        }
+        Update: {
+          external_order_id?: string
+          id?: string
+          order_data?: Json
+          partner_id?: string
+          received_at?: string
+          shipment_id?: string | null
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_orders_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "courier_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_orders_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
             referencedColumns: ["id"]
           },
         ]
@@ -160,11 +282,13 @@ export type Database = {
           city: string
           cod_amount: number
           cod_collected: boolean
+          courier_partner_id: string | null
           created_at: string
           created_by: string | null
           delivered_at: string | null
           delivery_otp: string
           distributor_id: string | null
+          external_order_id: string | null
           id: string
           is_demo: boolean
           lot_id: string | null
@@ -172,6 +296,7 @@ export type Database = {
           notes: string | null
           otp_sent_at: string | null
           otp_verified_at: string | null
+          partner_awb: string | null
           pincode: string | null
           receiver_address: string
           receiver_name: string
@@ -188,11 +313,13 @@ export type Database = {
           city: string
           cod_amount?: number
           cod_collected?: boolean
+          courier_partner_id?: string | null
           created_at?: string
           created_by?: string | null
           delivered_at?: string | null
           delivery_otp?: string
           distributor_id?: string | null
+          external_order_id?: string | null
           id?: string
           is_demo?: boolean
           lot_id?: string | null
@@ -200,6 +327,7 @@ export type Database = {
           notes?: string | null
           otp_sent_at?: string | null
           otp_verified_at?: string | null
+          partner_awb?: string | null
           pincode?: string | null
           receiver_address: string
           receiver_name: string
@@ -216,11 +344,13 @@ export type Database = {
           city?: string
           cod_amount?: number
           cod_collected?: boolean
+          courier_partner_id?: string | null
           created_at?: string
           created_by?: string | null
           delivered_at?: string | null
           delivery_otp?: string
           distributor_id?: string | null
+          external_order_id?: string | null
           id?: string
           is_demo?: boolean
           lot_id?: string | null
@@ -228,6 +358,7 @@ export type Database = {
           notes?: string | null
           otp_sent_at?: string | null
           otp_verified_at?: string | null
+          partner_awb?: string | null
           pincode?: string | null
           receiver_address?: string
           receiver_name?: string
@@ -241,6 +372,13 @@ export type Database = {
           weight_kg?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "shipments_courier_partner_id_fkey"
+            columns: ["courier_partner_id"]
+            isOneToOne: false
+            referencedRelation: "courier_partners"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "shipments_lot_id_fkey"
             columns: ["lot_id"]
@@ -287,11 +425,13 @@ export type Database = {
           city: string
           cod_amount: number
           cod_collected: boolean
+          courier_partner_id: string | null
           created_at: string
           created_by: string | null
           delivered_at: string | null
           delivery_otp: string
           distributor_id: string | null
+          external_order_id: string | null
           id: string
           is_demo: boolean
           lot_id: string | null
@@ -299,6 +439,7 @@ export type Database = {
           notes: string | null
           otp_sent_at: string | null
           otp_verified_at: string | null
+          partner_awb: string | null
           pincode: string | null
           receiver_address: string
           receiver_name: string
@@ -324,11 +465,13 @@ export type Database = {
           city: string
           cod_amount: number
           cod_collected: boolean
+          courier_partner_id: string | null
           created_at: string
           created_by: string | null
           delivered_at: string | null
           delivery_otp: string
           distributor_id: string | null
+          external_order_id: string | null
           id: string
           is_demo: boolean
           lot_id: string | null
@@ -336,6 +479,7 @@ export type Database = {
           notes: string | null
           otp_sent_at: string | null
           otp_verified_at: string | null
+          partner_awb: string | null
           pincode: string | null
           receiver_address: string
           receiver_name: string
@@ -370,6 +514,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      import_partner_order: { Args: { _id: string }; Returns: string }
       is_ancestor: { Args: { _anc: string; _desc: string }; Returns: boolean }
       seed_demo_orders: {
         Args: { _city?: string; _count: number; _lot?: string }

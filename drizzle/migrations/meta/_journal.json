@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791999038002,
+      "tag": "0000_courier_partner_exchange",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791999595725,
+      "tag": "0001_validate_partner_order_review",
+      "breakpoints": true
+    }
+  ]
+}

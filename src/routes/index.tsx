@@ -1,150 +1,35 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, QrCode, ScanLine, Volume2, Users, IndianRupee, Radio, Building2, Briefcase, Bike, Crown, Check } from "lucide-react";
-import { Brand } from "@/components/Brand";
-import { Button } from "@/components/ui/button";
-import { QrCode as Qr } from "@/components/QrCode";
-import hero from "@/assets/hero-rider.jpg";
-
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "RouteFlow OS — QR Delivery Automation SaaS" },
-      { name: "description", content: "Generate QR parcel labels, scan with any phone camera, and run your admin → distributor → manager → rider delivery network." },
-      { property: "og:title", content: "RouteFlow OS — QR Delivery Automation SaaS" },
-      { property: "og:description", content: "QR labels, phone-camera scanning with sound alerts, and a flexible delivery team hierarchy." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: Landing,
-});
-
-const FEATURES = [
-  { icon: QrCode, title: "Instant QR labels", text: "Every shipment gets a unique QR label, ready to print in one tap." },
-  { icon: ScanLine, title: "Scan with any phone", text: "No hardware. Riders use their phone camera to pick up and deliver." },
-  { icon: Volume2, title: "Sound & vibration", text: "Clear success chime and error buzz so riders never miss a scan." },
-  { icon: Radio, title: "Live status", text: "Status changes sync instantly across every dashboard in your team." },
-  { icon: IndianRupee, title: "COD tracking", text: "Know exactly how much cash is pending collection per rider." },
-  { icon: Users, title: "Flexible hierarchy", text: "Riders under managers or directly under distributors — your call." },
-];
-
-const STEPS = ["Created", "Assigned", "Picked up", "Out for delivery", "Delivered"];
-
-function Landing() {
-  return (
-    <div className="min-h-screen bg-background">
-      <section className="relative overflow-hidden bg-gradient-hero text-navy-foreground">
-        <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6">
-          <Brand light />
-          <nav className="flex items-center gap-2 sm:gap-4">
-            <Link to="/track" search={{}} className="hidden text-sm font-medium opacity-80 hover:opacity-100 sm:block">Track parcel</Link>
-            <Link to="/auth" className="text-sm font-medium opacity-80 hover:opacity-100">Login</Link>
-            <Button asChild variant="hero" size="sm"><Link to="/auth">Get started <ArrowRight /></Link></Button>
-          </nav>
-        </header>
-
-        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-10 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-2 lg:pb-24 lg:pt-12">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-navy-foreground/20 px-3 py-1 text-xs font-semibold animate-rise">
-              <span className="h-2 w-2 rounded-full bg-lime" /> Built for Indian last-mile delivery
-            </span>
-            <h1 className="mt-6 text-4xl font-bold leading-[1.05] sm:text-6xl animate-rise" style={{ animationDelay: "80ms" }}>
-              Scan the parcel.<br /><span className="text-gradient-brand">Automate the rest.</span>
-            </h1>
-            <p className="mt-5 max-w-lg text-base opacity-80 sm:text-lg animate-rise" style={{ animationDelay: "160ms" }}>
-              QR labels, phone-camera scanning with sound alerts, and one command center for admins, distributors, managers and riders.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3 animate-rise" style={{ animationDelay: "240ms" }}>
-              <Button asChild variant="hero" size="lg" className="h-12"><Link to="/auth">Start free <ArrowRight /></Link></Button>
-              <Button asChild variant="outline" size="lg" className="h-12 border-navy-foreground/30 bg-transparent text-navy-foreground hover:bg-navy-foreground/10 hover:text-navy-foreground">
-                <Link to="/track" search={{}}><ScanLine /> Track a parcel</Link>
-              </Button>
-            </div>
-          </div>
-          <div className="relative animate-rise" style={{ animationDelay: "200ms" }}>
-            <img src={hero} alt="Rider on scooter with QR-labelled delivery box" width={1280} height={1024} className="w-full rounded-3xl shadow-glow" />
-            <div className="absolute -bottom-6 left-4 flex items-center gap-3 rounded-2xl bg-card p-3 text-card-foreground shadow-card animate-float sm:left-8">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-success/15 text-success"><Check /></span>
-              <div><p className="text-sm font-bold">Delivered</p><p className="font-mono text-xs text-muted-foreground">RF261014A7K2Q</p></div>
-            </div>
-          </div>
-        </div>
-        <svg className="absolute inset-x-0 bottom-0 h-24 w-full opacity-40" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden>
-          <path d="M0 80 C 300 10, 500 100, 760 50 S 1200 0, 1440 60" fill="none" stroke="var(--lime)" strokeWidth="2" strokeDasharray="6 8" className="animate-dash" />
-        </svg>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
-        <h2 className="max-w-2xl text-3xl font-bold sm:text-4xl">Everything a delivery network needs, nothing it doesn’t.</h2>
-        <div className="mt-10 grid gap-px overflow-hidden rounded-3xl border bg-border sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((f) => (
-            <div key={f.title} className="bg-card p-6 sm:p-8">
-              <f.icon className="h-6 w-6 text-primary" />
-              <h3 className="mt-4 text-lg font-bold">{f.title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{f.text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="bg-navy text-navy-foreground">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2">
-          <div>
-            <p className="text-sm font-semibold text-lime">Who does what</p>
-            <h2 className="mt-2 text-3xl font-bold sm:text-4xl">A team tree that bends to your business</h2>
-            <p className="mt-4 opacity-75">Each level sees only its own network. Add people below you in seconds — they log in with the email and password you set.</p>
-          </div>
-          <ol className="space-y-3">
-            {[
-              { i: Crown, r: "Admin", t: "Owns the platform, sees everything, adds distributors." },
-              { i: Building2, r: "Distributor", t: "Runs a region. Adds managers and riders." },
-              { i: Briefcase, r: "Manager", t: "Runs a hub inside a distributor. Adds riders, assigns parcels." },
-              { i: Bike, r: "Rider", t: "Scans, picks up and delivers. Collects COD." },
-            ].map((x, idx) => (
-              <li key={x.r} className="flex items-center gap-4 rounded-2xl border border-navy-foreground/10 bg-navy-foreground/5 p-4" style={{ marginLeft: idx * 20 }}>
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-brand"><x.i className="h-5 w-5" /></span>
-                <div><p className="font-bold">{x.r}</p><p className="text-sm opacity-70">{x.t}</p></div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2">
-        <div className="mx-auto w-full max-w-sm rounded-3xl border bg-card p-6 shadow-card">
-          <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground"><span>ROUTEFLOW OS</span><span>COD ₹1,250</span></div>
-          <div className="mt-4 flex justify-center"><Qr value="RF-DEMO-LABEL" size={180} /></div>
-          <p className="mt-4 text-center font-mono text-lg font-bold">RF-DEMO-LABEL</p>
-          <p className="text-center text-xs text-muted-foreground">Sample label · Sri Ganganagar</p>
-        </div>
-        <div>
-          <h2 className="text-3xl font-bold sm:text-4xl">From label to doorstep in five scans</h2>
-          <ol className="mt-8 space-y-4">
-            {STEPS.map((s, i) => (
-              <li key={s} className="flex items-center gap-4">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-brand font-bold text-primary-foreground tabular">{i + 1}</span>
-                <span className="font-semibold">{s}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
-        <div className="rounded-3xl bg-gradient-brand p-10 text-center text-primary-foreground sm:p-16">
-          <h2 className="text-3xl font-bold sm:text-4xl">Ready to automate your deliveries?</h2>
-          <p className="mx-auto mt-3 max-w-lg opacity-90">The first account you create becomes the Admin. Then build your team.</p>
-          <Button asChild size="lg" variant="secondary" className="mt-8 h-12"><Link to="/auth">Create admin account <ArrowRight /></Link></Button>
-        </div>
-      </section>
-
-      <footer className="border-t">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:px-6">
-          <Brand />
-          <div className="flex gap-6"><Link to="/track" search={{}}>Track</Link><Link to="/auth">Login</Link></div>
-          <p>© {new Date().getFullYear()} RouteFlow OS</p>
-        </div>
-      </footer>
-    </div>
-  );
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { ArrowUpRight, ArrowRight, ScanLine, Package, Truck, ShieldCheck, Search, Check, Layers, Radio } from 'lucide-react';
+import { useRef, useState } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+import { PublicShell } from '@/components/PublicShell';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { photos } from '@/lib/photography';
+import { pageHead } from '@/lib/seo';
+gsap.registerPlugin(useGSAP, ScrollTrigger);
+export const Route = createFileRoute('/')({ head:()=>pageHead('Connected courier operations','Barcode-first shipment operations, courier partner exchange and delivery tracking in one Bnoy workspace.'), component:Landing });
+const stages = ['Book & label','Pick up','Hub scan','Sort & assign','In transit','Deliver'];
+function Landing(){
+ const scope=useRef<HTMLDivElement>(null); const [code,setCode]=useState(''); const navigate=useNavigate();
+ useGSAP(()=>{const mm=gsap.matchMedia();mm.add('(prefers-reduced-motion: no-preference)',()=>{gsap.from('[data-intro]',{y:22,opacity:0,duration:.9,stagger:.12,ease:'power3.out'});gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach(el=>gsap.from(el,{y:28,opacity:0,duration:.7,ease:'power2.out',scrollTrigger:{trigger:el,start:'top 90%',once:true}}));});return()=>mm.revert();},{scope});
+ return <div ref={scope}><PublicShell>
+ <section className="relative isolate min-h-[470px] overflow-hidden bg-navy text-navy-foreground sm:min-h-[490px]">
+  <img src={photos.warehouse} alt="Indian warehouse team sorting parcels on a conveyor" width={1920} height={1024} fetchPriority="high" className="absolute inset-0 -z-20 h-full w-full object-cover object-[65%_center]"/>
+  <div className="hero-shade absolute inset-0 -z-10"/>
+  <div className="public-container py-12 sm:py-14"><div className="max-w-xl"><p data-intro className="flex items-center gap-2 text-[11px] font-semibold uppercase text-lime"><span className="h-px w-6 bg-lime"/>Built for the next mile</p><h1 data-intro className="mt-5 text-[44px] font-semibold leading-[1.1] sm:text-[58px]">Bnoy Logistics OS<span className="mt-2 block text-[30px] font-medium sm:text-[38px]">Every parcel.<br/>A connected journey.</span></h1><p data-intro className="mt-5 max-w-md text-sm leading-7 text-navy-foreground/85">Bring your shipments, sorting teams and courier partners together. Less chasing updates. More moving forward.</p><div data-intro className="mt-7 flex flex-wrap gap-3"><Button asChild className="h-11 bg-lime text-navy hover:bg-lime/90"><Link to="/auth">Open your workspace<ArrowUpRight/></Link></Button><Button asChild variant="outline" className="h-11 border-navy-foreground/40 bg-transparent text-navy-foreground hover:bg-navy-foreground/10 hover:text-navy-foreground"><Link to="/solutions">Explore the platform<ArrowRight/></Link></Button></div></div></div>
+ </section>
+ <section className="border-b bg-card"><div className="public-container grid gap-5 py-6 md:grid-cols-[1fr_1.3fr] md:items-center"><div className="flex items-center gap-3"><Package className="size-5 text-primary"/><div><h2 className="text-sm font-semibold">Where’s your shipment?</h2><p className="mt-1 text-xs text-muted-foreground">One reference. The latest recorded status.</p></div></div><form className="flex gap-2" onSubmit={e=>{e.preventDefault();if(code.trim())navigate({to:'/track',search:{code:code.trim()}});}}><Input aria-label="Tracking number or order ID" value={code} onChange={e=>setCode(e.target.value)} placeholder="Enter tracking number or order ID" className="h-11 bg-background" maxLength={120} required/><Button type="submit" aria-label="Track shipment" className="h-11"><Search/><span className="hidden sm:inline">Track shipment</span></Button></form></div></section>
+ <section className="public-container py-14"><div className="flex flex-wrap items-center justify-between gap-6 border-b pb-10"><p className="max-w-xs text-sm leading-6 text-muted-foreground">Your operations, connected to the courier ecosystem.</p><div className="flex flex-wrap items-center gap-7 text-xl font-semibold text-foreground/70"><span>shiprocket</span><span>DELHIVERY</span><span className="text-sm font-medium text-muted-foreground">+ Your courier partner</span></div><span className="text-[10px] text-muted-foreground">Available adapters · connection required</span></div>
+ <div data-reveal className="mt-14 flex flex-wrap items-end justify-between gap-6"><div><p className="eyebrow">One workspace. Every handover.</p><h2 className="section-heading mt-3 max-w-xl">The moving parts.<br/>Finally working together.</h2></div><Link to="/solutions" className="flex items-center gap-2 text-sm font-semibold text-primary">Explore solutions<ArrowUpRight className="size-4"/></Link></div>
+ <div className="mt-8 grid gap-7 md:grid-cols-3">{[{image:photos.scanner,title:'A scan that moves things forward',text:'Print unique labels. Scan at handover. Keep each parcel tied to the right rider.',icon:ScanLine},{image:photos.conveyor,title:'Sorting without the guesswork',text:'Manager lots become rider work queues, with ownership confirmed at every scan.',icon:Layers},{image:photos.handover,title:'A clearer final mile',text:'Recorded delivery events, COD amounts and recipient verification in one place.',icon:Truck}].map((f,i)=><article data-reveal key={f.title}><div className="photo-frame aspect-[4/3]"><img src={f.image} alt={f.title} width={1280} height={1024} loading="lazy"/></div><div className="mt-5 flex items-center gap-2 text-[10px] font-semibold text-primary"><f.icon className="size-3.5"/>0{i+1} / OPERATIONS</div><h3 className="mt-3 text-lg font-semibold">{f.title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{f.text}</p></article>)}</div>
+ </section>
+ <section className="border-y bg-muted/50"><div className="public-container py-14"><div data-reveal className="flex flex-wrap items-end justify-between gap-5"><div><p className="eyebrow">The parcel journey</p><h2 className="section-heading mt-3">Nothing lost between handovers.</h2></div><span className="text-xs text-muted-foreground">From a unique label to verified delivery</span></div><ol className="mt-10 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">{stages.map((s,i)=><li data-reveal key={s} className="border-t-2 border-primary/30 pt-4"><span className="font-mono text-xs text-primary">0{i+1}</span><h3 className="mt-2 text-sm font-semibold">{s}</h3></li>)}</ol></div></section>
+ <section className="public-container py-16"><div className="grid items-center gap-10 lg:grid-cols-2"><div data-reveal><p className="eyebrow">Your network. Your way.</p><h2 className="section-heading mt-3">Built around the people<br/>behind every delivery.</h2><p className="mt-5 max-w-md text-sm leading-7 text-muted-foreground">Admins, distributors, managers and riders share a workspace—not the same permissions. Keep the right information with the right team.</p><ul className="mt-6 space-y-3 text-sm">{['Flexible manager and rider hierarchy','Rider parcel allocation through sorting scans','Courier orders in a dedicated exchange queue'].map(t=><li key={t} className="flex items-center gap-2"><Check className="size-4 text-primary"/>{t}</li>)}</ul><Button asChild variant="outline" className="mt-7"><Link to="/auth">Meet your workspace<ArrowUpRight/></Link></Button></div><div data-reveal className="photo-frame aspect-[4/3]"><img src={photos.operations} alt="Logistics managers reviewing operations together" width={1280} height={1024} loading="lazy"/></div></div></section>
+ <section className="bg-navy text-navy-foreground"><div className="public-container py-14"><div data-reveal className="flex flex-wrap items-end justify-between gap-5"><div><p className="text-[11px] font-semibold uppercase text-lime">From warehouse to doorstep</p><h2 className="section-heading mt-3">Real work. One connected system.</h2></div><Link to="/solutions" className="flex items-center gap-2 text-sm text-lime">See every operation<ArrowUpRight className="size-4"/></Link></div><div className="mt-8 grid grid-cols-2 gap-5 md:grid-cols-4">{[{src:photos.merchant,label:'Merchant fulfilment'},{src:photos.dispatch,label:'Fleet & dispatch'},{src:photos.rider,label:'Last-mile delivery'},{src:photos.packaging,label:'Careful handling'}].map(x=><article data-reveal key={x.label}><div className="photo-frame aspect-[4/5]"><img src={x.src} alt={x.label} width={1280} height={1024} loading="lazy"/></div><p className="mt-4 text-sm font-medium">{x.label}</p></article>)}</div></div></section>
+ <section className="public-container grid gap-8 py-16 md:grid-cols-3">{[{i:ShieldCheck,t:'Access with boundaries',d:'Role-based permissions keep shipment and team information scoped to your network.'},{i:Radio,t:'Updates, not assumptions',d:'Tracking reflects recorded events. Courier feeds stay disconnected until credentials are configured.'},{i:Package,t:'Labels that belong to an order',d:'Unique tracking references, printable barcodes and QR codes keep physical parcels connected.'}].map(x=><div data-reveal key={x.t} className="border-t pt-6"><x.i className="size-5 text-primary"/><h3 className="mt-4 text-base font-semibold">{x.t}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{x.d}</p></div>)}</section>
+ <section className="border-t bg-accent/50"><div data-reveal className="public-container flex flex-wrap items-center justify-between gap-7 py-12"><div><p className="eyebrow">The next mile starts here</p><h2 className="mt-3 text-3xl font-semibold">Make room for better operations.</h2></div><Button asChild size="lg" className="h-12"><Link to="/auth">Get started with Bnoy<ArrowUpRight/></Link></Button></div></section>
+ </PublicShell></div>;
 }

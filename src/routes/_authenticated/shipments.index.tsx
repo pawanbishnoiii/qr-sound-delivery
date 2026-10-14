@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/seo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { z } from "zod";
@@ -22,7 +23,7 @@ const CITIES = ["Gharsana", "Anupgarh", "Suratgarh", "Raisinghnagar", "Sri Ganga
 
 export const Route = createFileRoute("/_authenticated/shipments/")({
   validateSearch: z.object({ new: z.boolean().optional() }),
-  head: () => ({ meta: [{ title: "Shipments — RouteFlow OS" }, { name: "description", content: "All shipments" }] }),
+  head: () => pageHead("Shipments", "All shipments"),
   component: Shipments,
 });
 
@@ -55,7 +56,7 @@ function Shipments() {
     if (status !== "all" && s.status !== status) return false;
     const t = q.trim().toLowerCase();
     if (!t) return true;
-    return [s.tracking_code, s.receiver_name, s.receiver_phone, s.city].some((v) => v?.toLowerCase().includes(t));
+    return [s.tracking_code, s.id, s.external_order_id, s.partner_awb, s.receiver_name, s.receiver_phone, s.city].some((v) => v?.toLowerCase().includes(t));
   });
 
   const canCreate = role && role !== "rider";
@@ -74,7 +75,7 @@ function Shipments() {
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input className="pl-9" placeholder="Search code, name, phone, city" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Input className="pl-9" placeholder="Search tracking, order ID, AWB, name or phone" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <select className={`${selectCls} sm:w-48`} value={status} onChange={(e) => setStatus(e.target.value as ShipmentStatus | "all")}>
           <option value="all">All statuses</option>
@@ -82,7 +83,7 @@ function Shipments() {
         </select>
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-2xl border bg-card shadow-card">
+      <div className="mt-4 overflow-hidden rounded-lg border bg-card shadow-card">
         {isLoading ? (
           <div className="grid place-items-center py-16"><Loader2 className="animate-spin text-muted-foreground" /></div>
         ) : filtered.length === 0 ? (

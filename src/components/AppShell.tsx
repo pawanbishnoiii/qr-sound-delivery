@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/auth";
 import { ROLE_LABEL } from "@/lib/status";
 import { Brand } from "./Brand";
+import { Button } from "./ui/button";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -13,7 +14,7 @@ const NAV = [
   { to: "/scan", label: "Scan", icon: ScanLine },
   { to: "/lots", label: "Lots", icon: Layers },
   { to: "/team", label: "Team", icon: Users },
-  { to: "/providers", label: "Providers", icon: Plug },
+  { to: "/providers", label: "Courier partners", icon: Plug },
 ] as const;
 
 export function AppShell({ title, actions, children }: { title: string; actions?: ReactNode; children: ReactNode }) {
@@ -47,12 +48,12 @@ export function AppShell({ title, actions, children }: { title: string; actions?
   );
 
   const userCard = (
-    <div className="rounded-xl border border-sidebar-border p-3">
+    <div className="rounded-md border border-sidebar-border p-3">
       <p className="truncate text-sm font-semibold text-sidebar-accent-foreground">{profile?.full_name || user?.email}</p>
       <p className="truncate text-xs text-sidebar-foreground">{role ? ROLE_LABEL[role] : "No role yet"}</p>
-      <button onClick={signOut} className="mt-3 flex items-center gap-2 text-xs font-medium text-sidebar-foreground hover:text-sidebar-accent-foreground">
+      <Button variant="ghost" size="sm" onClick={signOut} className="mt-3 h-auto p-0 text-xs text-sidebar-foreground hover:bg-transparent hover:text-sidebar-accent-foreground">
         <LogOut className="h-3.5 w-3.5" /> Sign out
-      </button>
+      </Button>
     </div>
   );
 
@@ -73,7 +74,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
             <div className="space-y-8">
               <div className="flex items-center justify-between">
                 <Brand light />
-                <button onClick={() => setOpen(false)} aria-label="Close menu" className="text-sidebar-foreground"><X /></button>
+                <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close menu" className="text-sidebar-foreground"><X /></Button>
               </div>
               {nav}
             </div>
@@ -84,7 +85,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
 
       <header className="sticky top-0 z-30 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b bg-background/85 px-4 py-3 backdrop-blur sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-3">
-          <button className="shrink-0 lg:hidden" onClick={() => setOpen(true)} aria-label="Open menu"><Menu /></button>
+          <Button variant="ghost" size="icon" className="shrink-0 lg:hidden" onClick={() => setOpen(true)} aria-label="Open menu"><Menu /></Button>
           <h1 className="truncate text-lg font-bold sm:text-xl">{title}</h1>
         </div>
         <div className="flex items-center gap-2">{actions}</div>
@@ -104,8 +105,8 @@ export function AppShell({ title, actions, children }: { title: string; actions?
       </main>
 
       {/* Mobile bottom bar */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
-        {NAV.slice(0, 5).map((n) => (
+      <nav className="fixed inset-x-0 bottom-0 z-40 grid auto-cols-fr grid-flow-col border-t bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
+        {NAV.slice(0, 5).filter(n => !(n.to === "/team" && role === "rider")).map((n) => (
           <Link
             key={n.to}
             to={n.to}
