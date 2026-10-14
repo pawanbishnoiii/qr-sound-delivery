@@ -56,7 +56,7 @@ function TrackPage() {
           className="mt-6 flex gap-2"
           onSubmit={(e) => { e.preventDefault(); navigate({ search: { code: input.trim() || undefined } }); }}
         >
-          <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="e.g. RF261014AB12C" className="h-12 font-mono uppercase" maxLength={40} />
+          <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Tracking code or order ID" className="h-12 font-mono uppercase" maxLength={40} />
           <Button type="submit" variant="hero" className="h-12 px-6"><Search /> Track</Button>
         </form>
 
@@ -91,6 +91,11 @@ function TrackPage() {
             </ol>
           </div>
         )}
+        <div className="mt-10 rounded-2xl bg-navy p-5 text-navy-foreground">
+          <p className="font-bold">Tracking API</p>
+          <p className="mt-1 text-sm opacity-75">Fetch status as JSON using a tracking code or order ID.</p>
+          <pre className="mt-3 overflow-x-auto rounded-xl bg-navy-foreground/10 p-3 text-xs">GET /api/public/track/{code || "RF261014ABCDE"}</pre>
+        </div>
       </main>
     </div>
   );
