@@ -13,9 +13,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useMe, useTeam } from "@/lib/auth";
 import { useShipments } from "@/lib/shipments";
+import { selectCls } from "@/lib/ui";
 import { STATUS_META, fmtDate, inr, type ShipmentStatus } from "@/lib/status";
 
-export const selectCls = "h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-1 focus:ring-ring";
 const CITIES = ["Gharsana", "Anupgarh", "Suratgarh", "Raisinghnagar", "Sri Ganganagar"];
 
 export const Route = createFileRoute("/_authenticated/shipments/")({
