@@ -23,6 +23,6 @@ export const signUpWithPhone = createServerFn({ method: "POST" })
       user_metadata: { full_name: data.name, phone: "+91" + data.phone, phone_verified_demo: true },
     });
     if (error) console.error("phone signup failed:", error.message);
-    if (error) return { error: /already/i.test(error.message) ? "This number is already registered — sign in instead" : "Could not create account" };
+    if (error) return { error: /already/i.test(error.message) ? "This number is already registered — sign in instead" : error.message };
     return { error: null };
   });
