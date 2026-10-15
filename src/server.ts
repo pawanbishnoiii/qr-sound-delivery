@@ -60,7 +60,7 @@ export default {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      if (response.status >= 500 && isClientAbort(request, consumePeek())) {
+      if (response.status >= 500 && isClientAbort(request)) {
         return new Response(null, { status: 499 });
       }
       return await normalizeCatastrophicSsrResponse(response);
@@ -74,7 +74,3 @@ export default {
     }
   },
 };
-
-function consumePeek(): unknown {
-  return undefined;
-}
