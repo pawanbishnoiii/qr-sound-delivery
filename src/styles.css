@@ -185,8 +185,10 @@
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 @utility marquee-track {
-  display: flex; width: max-content;
+  display: flex; width: max-content; animation: marquee 32s linear infinite;
+  @media (prefers-reduced-motion: reduce) { animation: none; }
 }
+@keyframes marquee { to { transform: translateX(-50%); } }
 @utility grain {
   position: relative;
   &::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .09; mix-blend-mode: overlay;
