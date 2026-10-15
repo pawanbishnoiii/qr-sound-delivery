@@ -41,7 +41,7 @@ export const createMember = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
       email: `p${data.phone}@phone.bnoy.app`,
-      password: crypto.randomUUID() + "Aa1!" + crypto.randomUUID(),
+      password: crypto.randomUUID() + "Aa1!",
       email_confirm: true,
       user_metadata: { full_name: data.full_name, phone: "+91" + data.phone },
     });
