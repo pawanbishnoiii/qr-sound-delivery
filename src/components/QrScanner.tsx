@@ -33,6 +33,7 @@ export function QrScanner({ onScan, paused }: Props) {
           (text: string) => { if (!pausedRef.current) cb.current(text); },
           () => {},
         );
+        if (cancelled) { safeStop(s); return; }
         setError(null);
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e));
@@ -42,7 +43,7 @@ export function QrScanner({ onScan, paused }: Props) {
       cancelled = true;
       const s = scanner.current;
       scanner.current = null;
-      if (s) s.stop().then(() => s.clear()).catch(() => {});
+      if (s) safeStop(s);
     };
   }, [facing]);
 
@@ -71,4 +72,13 @@ export function QrScanner({ onScan, paused }: Props) {
       </Button>
     </div>
   );
+}
+
+function safeStop(s: { isScanning?: boolean; stop: () => Promise<void>; clear: () => void }) {
+  try {
+    if (!s.isScanning) return;
+    s.stop().then(() => s.clear()).catch(() => {});
+  } catch {
+    /* scanner never started */
+  }
 }
