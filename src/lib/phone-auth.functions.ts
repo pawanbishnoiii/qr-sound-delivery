@@ -23,12 +23,12 @@ export const phoneOtpLogin = createServerFn({ method: "POST" })
 
     // Existing account linked to this number (also covers staff added by admins).
     const { data: prof } = await supabaseAdmin
-      .from("profiles").select("email").in("phone", [full, data.phone]).not("email", "is", null).limit(1).maybeSingle();
+      .from("profiles").select("email")
+      .or(`phone.eq.${full},phone.eq.${data.phone},email.eq.${phoneEmail(data.phone)}`)
+      .not("email", "is", null).limit(1).maybeSingle();
     let email = prof?.email ?? phoneEmail(data.phone);
 
     if (!prof) {
-      const { data: link } = await supabaseAdmin.auth.admin.generateLink({ type: "magiclink", email });
-      if (link?.properties?.hashed_token) return { error: null, needsName: false, tokenHash: link.properties.hashed_token };
       if (!data.name || data.name.length < 2) return { error: null, needsName: true, tokenHash: null };
       const password = crypto.randomUUID() + "Aa1!" + crypto.randomUUID();
       const { error } = await supabaseAdmin.auth.admin.createUser({
@@ -39,6 +39,5 @@ export const phoneOtpLogin = createServerFn({ method: "POST" })
     }
     const { data: link, error } = await supabaseAdmin.auth.admin.generateLink({ type: "magiclink", email });
     if (error || !link?.properties?.hashed_token) return { error: error?.message ?? "Could not sign in", needsName: false, tokenHash: null };
-    email = "";
     return { error: null, needsName: false, tokenHash: link.properties.hashed_token };
   });
