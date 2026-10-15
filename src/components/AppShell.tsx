@@ -1,6 +1,6 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { LayoutDashboard, Package, ScanLine, Users, LogOut, Menu, X, Layers, Plug, Undo2, KeyRound, Trophy } from "lucide-react";
+import { LayoutDashboard, Package, ScanLine, Users, LogOut, Menu, X, Layers, Plug, Undo2, KeyRound, Trophy, ListChecks } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/auth";
@@ -10,6 +10,7 @@ import { Button } from "./ui/button";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/jobs", label: "Jobs", icon: ListChecks },
   { to: "/shipments", label: "Shipments", icon: Package },
   { to: "/scan", label: "Scan", icon: ScanLine },
   { to: "/lots", label: "Lots", icon: Layers },
@@ -25,6 +26,8 @@ export function AppShell({ title, actions, children }: { title: string; actions?
   const [open, setOpen] = useState(false);
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  const blocked = role === "rider" && (path.startsWith("/team") || path.startsWith("/riders"));
 
   async function signOut() {
     await qc.cancelQueries();
@@ -101,6 +104,12 @@ export function AppShell({ title, actions, children }: { title: string; actions?
             <p className="mt-2 text-sm text-muted-foreground">
               Your account is created. Ask your admin, distributor or manager to add you to their team.
             </p>
+          </div>
+        ) : blocked ? (
+          <div className="mx-auto max-w-md rounded-2xl border bg-card p-8 text-center shadow-card">
+            <h2 className="text-xl font-bold">Not available for your role</h2>
+            <p className="mt-2 text-sm text-muted-foreground">This page is for team leads. Use Jobs or Scan for your daily work.</p>
+            <Button asChild variant="hero" size="sm" className="mt-5"><Link to="/jobs">Open my jobs</Link></Button>
           </div>
         ) : (
           children

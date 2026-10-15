@@ -18,6 +18,7 @@ import { Route as SolutionsRouteImport } from './routes/solutions'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDevelopersRouteImport } from './routes/_authenticated/developers'
+import { Route as AuthenticatedJobsRouteImport } from './routes/_authenticated/jobs'
 import { Route as AuthenticatedLotsRouteImport } from './routes/_authenticated/lots'
 import { Route as AuthenticatedProvidersRouteImport } from './routes/_authenticated/providers'
 import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
@@ -75,6 +76,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
 const AuthenticatedDevelopersRoute = AuthenticatedDevelopersRouteImport.update({
   id: '/developers',
   path: '/developers',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedJobsRoute = AuthenticatedJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedLotsRoute = AuthenticatedLotsRouteImport.update({
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/track': typeof TrackRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/developers': typeof AuthenticatedDevelopersRoute
+  '/jobs': typeof AuthenticatedJobsRoute
   '/lots': typeof AuthenticatedLotsRoute
   '/providers': typeof AuthenticatedProvidersRoute
   '/returns': typeof AuthenticatedReturnsRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByTo {
   '/track': typeof TrackRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/developers': typeof AuthenticatedDevelopersRoute
+  '/jobs': typeof AuthenticatedJobsRoute
   '/lots': typeof AuthenticatedLotsRoute
   '/providers': typeof AuthenticatedProvidersRoute
   '/returns': typeof AuthenticatedReturnsRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/track': typeof TrackRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/developers': typeof AuthenticatedDevelopersRoute
+  '/_authenticated/jobs': typeof AuthenticatedJobsRoute
   '/_authenticated/lots': typeof AuthenticatedLotsRoute
   '/_authenticated/providers': typeof AuthenticatedProvidersRoute
   '/_authenticated/returns': typeof AuthenticatedReturnsRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/dashboard'
     | '/developers'
+    | '/jobs'
     | '/lots'
     | '/providers'
     | '/returns'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/dashboard'
     | '/developers'
+    | '/jobs'
     | '/lots'
     | '/providers'
     | '/returns'
@@ -285,6 +296,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/_authenticated/dashboard'
     | '/_authenticated/developers'
+    | '/_authenticated/jobs'
     | '/_authenticated/lots'
     | '/_authenticated/providers'
     | '/_authenticated/returns'
@@ -380,6 +392,13 @@ declare module '@tanstack/react-router' {
       path: '/developers'
       fullPath: '/developers'
       preLoaderRoute: typeof AuthenticatedDevelopersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/jobs': {
+      id: '/_authenticated/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof AuthenticatedJobsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/lots': {
@@ -486,6 +505,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDevelopersRoute: typeof AuthenticatedDevelopersRoute
+  AuthenticatedJobsRoute: typeof AuthenticatedJobsRoute
   AuthenticatedLotsRoute: typeof AuthenticatedLotsRoute
   AuthenticatedProvidersRoute: typeof AuthenticatedProvidersRoute
   AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
@@ -499,6 +519,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDevelopersRoute: AuthenticatedDevelopersRoute,
+  AuthenticatedJobsRoute: AuthenticatedJobsRoute,
   AuthenticatedLotsRoute: AuthenticatedLotsRoute,
   AuthenticatedProvidersRoute: AuthenticatedProvidersRoute,
   AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
