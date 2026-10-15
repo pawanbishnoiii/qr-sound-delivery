@@ -20,7 +20,7 @@ function Landing(){
    gsap.from('[data-headline-line]',{yPercent:110,rotate:2,duration:1.1,stagger:.14,ease:'power4.out'});
    gsap.from('[data-intro]',{y:18,opacity:0,duration:.8,stagger:.12,delay:.35,ease:'power3.out'});
    gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach(el=>gsap.from(el,{y:28,opacity:0,duration:.8,ease:'power2.out',scrollTrigger:{trigger:el,start:'top 92%',once:true}}));
-   gsap.utils.toArray<HTMLElement>('[data-count]').forEach(el=>{const end=Number(el.dataset.count);const o={v:0};gsap.to(o,{v:end,duration:1.4,ease:'power2.out',scrollTrigger:{trigger:el,start:'top 90%',once:true},onUpdate:()=>{el.textContent=String(Math.round(o.v));}});});
+   gsap.utils.toArray<HTMLElement>('[data-count]').forEach(el=>{const end=Number(el.dataset['count']);const o={v:0};gsap.to(o,{v:end,duration:1.4,ease:'power2.out',scrollTrigger:{trigger:el,start:'top 90%',once:true},onUpdate:()=>{el.textContent=String(Math.round(o.v));}});});
    gsap.utils.toArray<SVGPathElement>('[data-route-path]').forEach(path=>{
     const length=path.getTotalLength();
     gsap.fromTo(path,{strokeDasharray:length,strokeDashoffset:length},{strokeDashoffset:0,ease:'none',scrollTrigger:{trigger:'.journey-body',start:'top 65%',end:'bottom 65%',scrub:.6}});
