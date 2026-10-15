@@ -33,7 +33,7 @@ const GROUPS = [
     { to: "/developers", label: "API & webhooks", icon: KeyRound, roles: ADMIN },
   ] },
 ] as const;
-const NAV = GROUPS.flatMap((g) => g.items);
+const NAV = GROUPS.flatMap((g) => [...g.items]) as Array<(typeof GROUPS)[number]["items"][number]>;
 
 export function AppShell({ title, actions, children }: { title: string; actions?: ReactNode; children: ReactNode }) {
   const { profile, role, user } = useMe();
