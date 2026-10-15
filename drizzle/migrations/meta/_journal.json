@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792033961166,
+      "tag": "0000_rider_wallet_ratings_cancel_otp",
+      "breakpoints": true
+    }
+  ]
+}
