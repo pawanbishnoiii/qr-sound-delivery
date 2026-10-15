@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { LayoutDashboard, Package, ScanLine, Users, LogOut, Menu, X, Layers, Plug, Undo2, KeyRound, Trophy, ListChecks, Wallet } from "lucide-react";
+import { LayoutDashboard, Package, ScanLine, Users, LogOut, Menu, X, Layers, Plug, Undo2, KeyRound, Trophy, ListChecks, Wallet, MapPin, Barcode } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/auth";
@@ -8,19 +8,32 @@ import { ROLE_LABEL } from "@/lib/status";
 import { Brand } from "./Brand";
 import { Button } from "./ui/button";
 
-const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/jobs", label: "Jobs", icon: ListChecks },
-  { to: "/shipments", label: "Shipments", icon: Package },
-  { to: "/scan", label: "Scan", icon: ScanLine },
-  { to: "/lots", label: "Lots", icon: Layers },
-  { to: "/returns", label: "Returns", icon: Undo2 },
-  { to: "/team", label: "Team", icon: Users },
-  { to: "/riders", label: "Rider performance", icon: Trophy },
-  { to: "/payouts", label: "Pay & bonuses", icon: Wallet },
-  { to: "/providers", label: "Courier partners", icon: Plug },
-  { to: "/developers", label: "API & webhooks", icon: KeyRound },
+type Role = "admin" | "distributor" | "manager" | "rider";
+const ALL: Role[] = ["admin", "distributor", "manager", "rider"];
+const LEADS: Role[] = ["admin", "distributor", "manager"];
+const ADMIN: Role[] = ["admin"];
+const GROUPS = [
+  { title: "Operations", items: [
+    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ALL },
+    { to: "/jobs", label: "Jobs", icon: ListChecks, roles: ALL },
+    { to: "/shipments", label: "Shipments", icon: Package, roles: ALL },
+    { to: "/scan", label: "Scan", icon: ScanLine, roles: ALL },
+    { to: "/lots", label: "Lots", icon: Layers, roles: ALL },
+    { to: "/returns", label: "Returns", icon: Undo2, roles: ALL },
+  ] },
+  { title: "Analytics & warehouse", items: [
+    { to: "/hubs", label: "Hub network", icon: MapPin, roles: LEADS },
+    { to: "/manifest", label: "Barcode manifest", icon: Barcode, roles: LEADS },
+    { to: "/riders", label: "Rider performance", icon: Trophy, roles: LEADS },
+  ] },
+  { title: "Network & settings", items: [
+    { to: "/team", label: "Team", icon: Users, roles: LEADS },
+    { to: "/payouts", label: "Pay & bonuses", icon: Wallet, roles: LEADS },
+    { to: "/providers", label: "Courier partners", icon: Plug, roles: ADMIN },
+    { to: "/developers", label: "API & webhooks", icon: KeyRound, roles: ADMIN },
+  ] },
 ] as const;
+const NAV = GROUPS.flatMap((g) => g.items);
 
 export function AppShell({ title, actions, children }: { title: string; actions?: ReactNode; children: ReactNode }) {
   const { profile, role, user } = useMe();
@@ -28,7 +41,8 @@ export function AppShell({ title, actions, children }: { title: string; actions?
   const qc = useQueryClient();
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const blocked = role === "rider" && (path.startsWith("/team") || path.startsWith("/riders") || path.startsWith("/payouts"));
+  const current = NAV.find((n) => path.startsWith(n.to));
+  const blocked = !!role && !!current && !(current.roles as readonly string[]).includes(role);
 
   async function signOut() {
     await qc.cancelQueries();
@@ -38,19 +52,28 @@ export function AppShell({ title, actions, children }: { title: string; actions?
   }
 
   const nav = (
-    <nav className="flex flex-col gap-1">
-      {NAV.filter((n) => !((n.to === "/team" || n.to === "/riders" || n.to === "/payouts") && role === "rider") && !((n.to === "/providers" || n.to === "/developers") && role !== "admin")).map((n) => (
-        <Link
-          key={n.to}
-          to={n.to}
-          onClick={() => setOpen(false)}
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-          activeProps={{ className: "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary" }}
-        >
-          <n.icon className="h-4 w-4 shrink-0" />
-          {n.label}
-        </Link>
-      ))}
+    <nav className="flex flex-col gap-5 overflow-y-auto">
+      {GROUPS.map((g) => {
+        const items = g.items.filter((n) => role && (n.roles as readonly string[]).includes(role));
+        if (!items.length) return null;
+        return (
+          <div key={g.title} className="flex flex-col gap-1">
+            <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-sidebar-foreground/60">{g.title}</p>
+            {items.map((n) => (
+              <Link
+                key={n.to}
+                to={n.to}
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                activeProps={{ className: "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary" }}
+              >
+                <n.icon className="h-4 w-4 shrink-0" />
+                {n.label}
+              </Link>
+            ))}
+          </div>
+        );
+      })}
     </nav>
   );
 
@@ -67,7 +90,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
   return (
     <div className="min-h-screen bg-background lg:pl-64">
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col justify-between bg-sidebar p-4 lg:flex">
-        <div className="space-y-8">
+        <div className="min-h-0 space-y-6 overflow-y-auto">
           <Brand light />
           {nav}
         </div>
@@ -119,7 +142,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
 
       {/* Mobile bottom bar */}
       <nav className="fixed inset-x-0 bottom-0 z-40 grid auto-cols-fr grid-flow-col border-t bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
-        {NAV.slice(0, 5).filter(n => !(n.to === "/team" && role === "rider")).map((n) => (
+        {NAV.slice(0, 5).map((n) => (
           <Link
             key={n.to}
             to={n.to}
