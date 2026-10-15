@@ -11,13 +11,9 @@ import { useMe } from "@/lib/auth";
 import { useShipments } from "@/lib/shipments";
 import { RIDER_FEE, riderStats, useRatings, useWalletTxns } from "@/lib/rider";
 import { fmtDate, inr, type Shipment } from "@/lib/status";
-import { activeBonusTotal, useBonuses, usePayoutSettings } from "@/lib/payouts";
 
 /** App-style home for riders: today's work, wallet, rating and accuracy. */
 export function RiderHome() {
-  const { data: pay } = usePayoutSettings();
-  const { data: bonusRows = [] } = useBonuses();
-  const bonus = activeBonusTotal(bonusRows);
   const { user, profile } = useMe();
   const qc = useQueryClient();
   const { data: rows = [] } = useShipments();
