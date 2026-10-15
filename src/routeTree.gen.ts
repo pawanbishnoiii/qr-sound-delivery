@@ -20,6 +20,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDevelopersRouteImport } from './routes/_authenticated/developers'
 import { Route as AuthenticatedJobsRouteImport } from './routes/_authenticated/jobs'
 import { Route as AuthenticatedLotsRouteImport } from './routes/_authenticated/lots'
+import { Route as AuthenticatedPayoutsRouteImport } from './routes/_authenticated/payouts'
 import { Route as AuthenticatedProvidersRouteImport } from './routes/_authenticated/providers'
 import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
 import { Route as AuthenticatedRidersRouteImport } from './routes/_authenticated/riders'
@@ -86,6 +87,11 @@ const AuthenticatedJobsRoute = AuthenticatedJobsRouteImport.update({
 const AuthenticatedLotsRoute = AuthenticatedLotsRouteImport.update({
   id: '/lots',
   path: '/lots',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPayoutsRoute = AuthenticatedPayoutsRouteImport.update({
+  id: '/payouts',
+  path: '/payouts',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProvidersRoute = AuthenticatedProvidersRouteImport.update({
@@ -168,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/developers': typeof AuthenticatedDevelopersRoute
   '/jobs': typeof AuthenticatedJobsRoute
   '/lots': typeof AuthenticatedLotsRoute
+  '/payouts': typeof AuthenticatedPayoutsRoute
   '/providers': typeof AuthenticatedProvidersRoute
   '/returns': typeof AuthenticatedReturnsRoute
   '/riders': typeof AuthenticatedRidersRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/developers': typeof AuthenticatedDevelopersRoute
   '/jobs': typeof AuthenticatedJobsRoute
   '/lots': typeof AuthenticatedLotsRoute
+  '/payouts': typeof AuthenticatedPayoutsRoute
   '/providers': typeof AuthenticatedProvidersRoute
   '/returns': typeof AuthenticatedReturnsRoute
   '/riders': typeof AuthenticatedRidersRoute
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/_authenticated/developers': typeof AuthenticatedDevelopersRoute
   '/_authenticated/jobs': typeof AuthenticatedJobsRoute
   '/_authenticated/lots': typeof AuthenticatedLotsRoute
+  '/_authenticated/payouts': typeof AuthenticatedPayoutsRoute
   '/_authenticated/providers': typeof AuthenticatedProvidersRoute
   '/_authenticated/returns': typeof AuthenticatedReturnsRoute
   '/_authenticated/riders': typeof AuthenticatedRidersRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
     | '/developers'
     | '/jobs'
     | '/lots'
+    | '/payouts'
     | '/providers'
     | '/returns'
     | '/riders'
@@ -272,6 +282,7 @@ export interface FileRouteTypes {
     | '/developers'
     | '/jobs'
     | '/lots'
+    | '/payouts'
     | '/providers'
     | '/returns'
     | '/riders'
@@ -298,6 +309,7 @@ export interface FileRouteTypes {
     | '/_authenticated/developers'
     | '/_authenticated/jobs'
     | '/_authenticated/lots'
+    | '/_authenticated/payouts'
     | '/_authenticated/providers'
     | '/_authenticated/returns'
     | '/_authenticated/riders'
@@ -408,6 +420,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLotsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/payouts': {
+      id: '/_authenticated/payouts'
+      path: '/payouts'
+      fullPath: '/payouts'
+      preLoaderRoute: typeof AuthenticatedPayoutsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/providers': {
       id: '/_authenticated/providers'
       path: '/providers'
@@ -507,6 +526,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDevelopersRoute: typeof AuthenticatedDevelopersRoute
   AuthenticatedJobsRoute: typeof AuthenticatedJobsRoute
   AuthenticatedLotsRoute: typeof AuthenticatedLotsRoute
+  AuthenticatedPayoutsRoute: typeof AuthenticatedPayoutsRoute
   AuthenticatedProvidersRoute: typeof AuthenticatedProvidersRoute
   AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
   AuthenticatedRidersRoute: typeof AuthenticatedRidersRoute
@@ -521,6 +541,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDevelopersRoute: AuthenticatedDevelopersRoute,
   AuthenticatedJobsRoute: AuthenticatedJobsRoute,
   AuthenticatedLotsRoute: AuthenticatedLotsRoute,
+  AuthenticatedPayoutsRoute: AuthenticatedPayoutsRoute,
   AuthenticatedProvidersRoute: AuthenticatedProvidersRoute,
   AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
   AuthenticatedRidersRoute: AuthenticatedRidersRoute,

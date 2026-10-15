@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { LayoutDashboard, Package, ScanLine, Users, LogOut, Menu, X, Layers, Plug, Undo2, KeyRound, Trophy, ListChecks } from "lucide-react";
+import { LayoutDashboard, Package, ScanLine, Users, LogOut, Menu, X, Layers, Plug, Undo2, KeyRound, Trophy, ListChecks, Wallet } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/auth";
@@ -17,6 +17,7 @@ const NAV = [
   { to: "/returns", label: "Returns", icon: Undo2 },
   { to: "/team", label: "Team", icon: Users },
   { to: "/riders", label: "Rider performance", icon: Trophy },
+  { to: "/payouts", label: "Pay & bonuses", icon: Wallet },
   { to: "/providers", label: "Courier partners", icon: Plug },
   { to: "/developers", label: "API & webhooks", icon: KeyRound },
 ] as const;
@@ -38,7 +39,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
 
   const nav = (
     <nav className="flex flex-col gap-1">
-      {NAV.filter((n) => !((n.to === "/team" || n.to === "/riders") && role === "rider") && !((n.to === "/providers" || n.to === "/developers") && role !== "admin")).map((n) => (
+      {NAV.filter((n) => !((n.to === "/team" || n.to === "/riders" || n.to === "/payouts") && role === "rider") && !((n.to === "/providers" || n.to === "/developers") && role !== "admin")).map((n) => (
         <Link
           key={n.to}
           to={n.to}

@@ -4,6 +4,7 @@ import { Package, Truck, CheckCircle2, IndianRupee, ScanLine, Plus, Users } from
 import { AppShell } from "@/components/AppShell";
 import { RiderHome } from "@/components/RiderHome";
 import { SeedWorkspaceButton } from "@/components/SeedWorkspaceButton";
+import { FailureCharts } from "@/components/FailureCharts";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { useMe, useTeam } from "@/lib/auth";
@@ -120,6 +121,7 @@ function LeadDashboard() {
           )}
         </section>
       </div>
+      <FailureCharts rows={rows} />
     </AppShell>
   );
 }
