@@ -1,3 +1,4 @@
+import { MODE_IDS, type Mode } from "@/lib/scan-modes";
 import { pageHead } from "@/lib/seo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -17,8 +18,6 @@ import { playError, playSuccess, unlockAudio } from "@/lib/sound";
 import { selectCls } from "@/lib/ui";
 import { STATUS_META, type Shipment } from "@/lib/status";
 
-const MODE_IDS = ["lookup", "lot", "claim", "picked_up", "in_transit", "out_for_delivery", "delivered"] as const;
-type Mode = (typeof MODE_IDS)[number];
 
 export const Route = createFileRoute("/_authenticated/scan")({
   validateSearch: z.object({ mode: z.enum(MODE_IDS).optional(), lot: z.string().optional() }),
