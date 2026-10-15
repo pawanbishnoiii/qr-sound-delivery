@@ -210,7 +210,8 @@
   .journey-route-mobile { display: none; }
   .journey-chapter { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 100px; }
   .journey-chapter-reverse .journey-photo { order: 2; }
-  .journey-copy { padding-block: 24px; }
+  .journey-copy { padding-block: 24px; position: relative; z-index: 1; }
+  .journey-photo, .journey-copy { isolation: isolate; }
   .journey-photo { position: relative; }
 }
 @media (max-width: 1023px) {

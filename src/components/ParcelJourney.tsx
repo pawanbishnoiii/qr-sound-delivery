@@ -18,8 +18,8 @@ export function ParcelJourney() {
         </div>
         <div className="journey-body relative mt-14">
           <svg className="journey-route journey-route-desktop" viewBox="0 0 1000 1500" preserveAspectRatio="none" aria-hidden="true">
-            <path className="route-track" d="M500 0 V190 C500 300 940 300 940 430 S500 540 500 700 S60 840 60 970 S500 1090 500 1260 V1500" />
-            <path data-route-path className="route-ink" d="M500 0 V190 C500 300 940 300 940 430 S500 540 500 700 S60 840 60 970 S500 1090 500 1260 V1500" />
+            <path className="route-track" d="M500 0 C525 250 475 500 500 750 S525 1250 500 1500" />
+            <path data-route-path className="route-ink" d="M500 0 C525 250 475 500 500 750 S525 1250 500 1500" />
           </svg>
           <svg className="journey-route journey-route-mobile" viewBox="0 0 24 1500" preserveAspectRatio="none" aria-hidden="true"><path className="route-track" d="M12 0 V1500" /><path data-route-path className="route-ink" d="M12 0 V1500" /></svg>
           <ol className="relative space-y-16 sm:space-y-20">
