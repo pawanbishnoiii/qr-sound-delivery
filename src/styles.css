@@ -219,6 +219,8 @@
 }
 @media (max-width: 767px) {
   .landing-hero { min-height: auto; }
+  .landing-hero > .public-container { padding-block: 32px; }
+  .hero-mile-marker { margin-top: 28px; }
   .landing-hero .hero-shade { background: linear-gradient(90deg, color-mix(in oklab, var(--navy) 94%, transparent), color-mix(in oklab, var(--navy) 65%, transparent)); }
   .hero-brand { font-size: 48px; }
   .journey-route-desktop { display: none; }
