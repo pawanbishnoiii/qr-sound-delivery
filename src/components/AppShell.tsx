@@ -28,7 +28,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
   const qc = useQueryClient();
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const blocked = role === "rider" && (path.startsWith("/team") || path.startsWith("/riders"));
+  const blocked = role === "rider" && (path.startsWith("/team") || path.startsWith("/riders") || path.startsWith("/payouts"));
 
   async function signOut() {
     await qc.cancelQueries();

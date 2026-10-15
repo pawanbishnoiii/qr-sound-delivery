@@ -42,19 +42,19 @@ function Payouts() {
   async function saveRates() {
     const patch = Object.fromEntries(RATE_FIELDS.map((f) => [f.key, Math.max(0, Number(rates[f.key] || 0))]));
     const { error } = await supabase.from("payout_settings").update({ ...patch, updated_at: new Date().toISOString() }).eq("id", 1);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Delivery pay saved — applies to the next delivery");
     qc.invalidateQueries({ queryKey: ["payout-settings"] });
   }
 
   async function addBonus() {
-    if (b.name.trim().length < 2 || !b.starts_on || !b.ends_on) return toast.error("Add a name and both dates");
-    if (b.ends_on < b.starts_on) return toast.error("End date must be after start date");
+    if (b.name.trim().length < 2 || !b.starts_on || !b.ends_on) { toast.error("Add a name and both dates"); return; }
+    if (b.ends_on < b.starts_on) { toast.error("End date must be after start date"); return; }
     const { error } = await supabase.from("payout_bonuses").insert({
       name: b.name.trim(), kind: b.kind, starts_on: b.starts_on, ends_on: b.ends_on,
       rider_bonus: Number(b.rider_bonus || 0), manager_bonus: Number(b.manager_bonus || 0), distributor_bonus: Number(b.distributor_bonus || 0),
     });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Bonus added");
     setB({ ...b, name: "" });
     qc.invalidateQueries({ queryKey: ["payout-bonuses"] });
