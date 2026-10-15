@@ -1,28 +1,20 @@
 # Bnoy Logistics upgrade
 
-## Landing page completion
-- [x] Finish headline reveals using the existing display fonts.
-- [x] Add the scroll-drawn route and illustrated parcel journey.
-- [x] Verify tracking, navigation, reduced motion, and mobile layouts.
+## Completed
+- [x] Landing page, fonts, GSAP, tracking, mobile layouts
+- [x] 11 logistics photos, courier partners, API keys, signed webhooks
+- [x] Phone + demo OTP signup, returns/cancellations, rider wallet, ratings
+- [x] Team page: search, role filters, parcel counts, hierarchy tree
+- [x] AI issue assist, corridor analytics, abort-safe error handling
 
-- [x] Audit existing workflows and official integration documentation.
-- [x] Refresh brand, design tokens, public experience and operational shell with GSAP.
-- [x] Generate and integrate 11 individual logistics photographs.
-- [x] Add persistent admin courier partner management and secure exchange/webhook foundation.
-- [x] Verify public pages, admin partner flow, access boundaries and regression tests.
+## Current sprint (Oct 15)
+- [ ] Pay & bonuses admin-only (nav gate + RLS) — rider/manager hidden
+- [ ] Hubs: real India map, clickable Delhi/Mumbai/Bengaluru/Indore with on-time % + breach alerts
+- [ ] Backend jobs: verify/upgrade cron + webhook outbox processing
+- [ ] End-to-end test parcel: create → pickup → scan → OTP delivery → return (admin + rider)
+- [ ] Landing page: Shiprocket/Delhivery-inspired professional redesign + new images
+- [ ] Vercel deploy: document required env vars (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
-## External dependencies
-- Live courier credentials and provider-approved callback authentication are required before real partner traffic.
-- The uploaded enterprise specification spans later phases (tenant migration, finance, phone authentication, maps); preserve existing flows during this focused upgrade.- [x] Phone + demo OTP signup, returns/cancellations with photos and live location, partner API keys and signed webhooks.
-- [ ] Real SMS OTP — blocked on an SMS provider account.
-
-## Rider app & admin upgrade (Oct 2026)
-- [x] Rider wallet (auto ₹15 per delivery/return, none on cancel), ratings, daily accuracy
-- [x] Rider app-style home with call/deliver/cancel
-- [x] Cancel only with customer OTP (demo 1234)
-- [x] Phone-only signup + login with mobile number (demo OTP)
-- [x] Rider performance page for team leads
-- [x] API docs + B2B docs pages, printable bill, A4 barcode sheets
-- [ ] Real SMS OTP — needs SMS provider account
-- [ ] Live Shiprocket/Delhivery/Ekart sync — needs partner credentials
-- [ ] Wallet payouts/withdrawals — needs payout rules from owner
+## Blocked on external accounts
+- Real SMS OTP — needs SMS provider account
+- Live Shiprocket/Delhivery/Ekart sync — needs partner credentials
