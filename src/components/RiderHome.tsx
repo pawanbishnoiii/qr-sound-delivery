@@ -9,7 +9,7 @@ import { CancelOtpDialog } from "./CancelOtpDialog";
 import { Button } from "./ui/button";
 import { useMe } from "@/lib/auth";
 import { useShipments } from "@/lib/shipments";
-import { RIDER_FEE, riderStats, useRatings, useWalletTxns } from "@/lib/rider";
+import { riderStats, useRatings, useWalletTxns } from "@/lib/rider";
 import { fmtDate, inr, type Shipment } from "@/lib/status";
 
 /** App-style home for riders: today's work, wallet, rating and accuracy. */
@@ -85,7 +85,7 @@ export function RiderHome() {
             {txns.filter((t) => t.rider_id === user.id).slice(0, 10).map((t) => (
               <li key={t.id} className="flex justify-between py-2"><span>{t.note ?? t.kind}<br /><span className="text-xs text-muted-foreground">{fmtDate(t.created_at)}</span></span><span className="font-semibold text-success">+{inr(Number(t.amount))}</span></li>
             ))}
-            {!txns.some((t) => t.rider_id === user.id) && <li className="py-3 text-muted-foreground">Earn ₹{RIDER_FEE} for every delivery and return pickup.</li>}
+            {!txns.some((t) => t.rider_id === user.id) && <li className="py-3 text-muted-foreground">Deliver parcels to start earning — credits appear here automatically.</li>}
           </ul>
         </section>
       </div>
