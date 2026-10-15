@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useMe } from "@/lib/auth";
 import { fmtDate } from "@/lib/status";
 import { pageHead } from "@/lib/seo";
-import { createApiKey, createWebhook, testWebhook } from "@/lib/developer.functions";
+import { createApiKey, createWebhook, testWebhook, flushWebhooks, retryWebhook } from "@/lib/developer.functions";
 
 export const Route = createFileRoute("/_authenticated/developers")({
   head: () => pageHead("API & webhooks", "Create API keys for partners and subscribe to signed shipment events."),
@@ -34,6 +34,10 @@ function Developers() {
   const [busy, setBusy] = useState(false);
   const keys = useQuery({ queryKey: ["api_keys"], enabled: role === "admin", queryFn: async () => (await supabase.from("api_keys").select("id,name,prefix,last_used_at,revoked_at,created_at").order("created_at", { ascending: false })).data ?? [] });
   const hooks = useQuery({ queryKey: ["webhooks"], enabled: role === "admin", queryFn: async () => (await supabase.from("webhook_endpoints").select("id,name,url,events,active,last_status,last_delivery_at").order("created_at", { ascending: false })).data ?? [] });
+  const outbox = useQuery({ queryKey: ["outbox"], enabled: role === "admin", refetchInterval: 15000, queryFn: async () => (await supabase.from("webhook_outbox").select("id,endpoint_id,event,status,attempts,max_attempts,last_error,created_at").order("created_at", { ascending: false }).limit(50)).data ?? [] });
+  const deliveries = useQuery({ queryKey: ["deliveries"], enabled: role === "admin", refetchInterval: 15000, queryFn: async () => (await supabase.from("webhook_deliveries").select("id,event,attempt,ok,status_code,error,duration_ms,created_at").order("created_at", { ascending: false }).limit(30)).data ?? [] });
+  const flush = useServerFn(flushWebhooks);
+  const retry = useServerFn(retryWebhook);
   const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   if (role && role !== "admin") return <AppShell title="API & webhooks"><p className="text-sm text-muted-foreground">Only admins can manage API access.</p></AppShell>;
@@ -91,6 +95,26 @@ function Developers() {
           </ul>
         </section>
       </div>
+
+      <section className="mt-6 rounded-md border bg-card p-5 shadow-card">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div><h2 className="font-bold">Delivery log</h2><p className="text-sm text-muted-foreground">Every status change is queued and sent automatically each minute. Failed sends retry after 1, 5, 15, 60 and 360 minutes.</p></div>
+          <Button size="sm" variant="outline" disabled={busy} onClick={() => run(async () => { const r = await flush(); toast.success(`Sent ${r.delivered}, failed ${r.failed}`); qc.invalidateQueries({ queryKey: ["outbox"] }); qc.invalidateQueries({ queryKey: ["deliveries"] }); })}><Send /> Send queued now</Button>
+        </div>
+        <div className="mt-4 overflow-x-auto"><table className="w-full min-w-[640px] text-left text-sm"><thead className="text-xs text-muted-foreground"><tr>{["Event", "Webhook", "Status", "Tries", "Last error", "Created", ""].map((h) => <th key={h} className="py-2 pr-3 font-medium">{h}</th>)}</tr></thead>
+          <tbody className="divide-y">{(outbox.data ?? []).map((o) => (
+            <tr key={o.id}><td className="py-2 pr-3 font-mono text-xs">{o.event}</td><td className="pr-3">{(hooks.data ?? []).find((h) => h.id === o.endpoint_id)?.name ?? "—"}</td>
+              <td className={`pr-3 text-xs font-medium ${o.status === "delivered" ? "text-success" : o.status === "failed" ? "text-destructive" : "text-muted-foreground"}`}>{o.status}</td>
+              <td className="pr-3 tabular">{o.attempts}/{o.max_attempts}</td><td className="max-w-[220px] truncate pr-3 text-xs text-muted-foreground">{o.last_error ?? "—"}</td><td className="pr-3 text-xs text-muted-foreground">{fmtDate(o.created_at)}</td>
+              <td>{(o.status === "failed" || o.status === "cancelled") && <Button size="sm" variant="ghost" disabled={busy} onClick={() => run(async () => { await retry({ data: { id: o.id } }); qc.invalidateQueries({ queryKey: ["outbox"] }); })}>Retry</Button>}</td></tr>
+          ))}</tbody></table>
+          {outbox.data?.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No events queued yet.</p>}
+        </div>
+        <h3 className="mt-6 text-sm font-semibold">Recent attempts</h3>
+        <ul className="mt-2 divide-y text-xs">{(deliveries.data ?? []).map((d) => (
+          <li key={d.id} className="flex flex-wrap justify-between gap-2 py-2"><span className="font-mono">{d.event} · try {d.attempt}</span><span className={d.ok ? "text-success" : "text-destructive"}>{d.status_code ?? "no response"}{d.error ? ` · ${d.error}` : ""}</span><span className="text-muted-foreground">{d.duration_ms ?? "—"} ms · {fmtDate(d.created_at)}</span></li>
+        ))}</ul>
+      </section>
 
       <section className="mt-6 rounded-md bg-navy p-5 text-sm text-navy-foreground">
         <h2 className="font-bold">Quick reference</h2>
