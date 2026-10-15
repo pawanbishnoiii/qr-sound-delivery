@@ -33,7 +33,7 @@ export const seedDemoWorkspace = createServerFn({ method: "POST" })
       let id = existing?.id;
       if (!id) {
         const { data: c, error } = await supabaseAdmin.auth.admin.createUser({
-          email, password: crypto.randomUUID() + "Aa1!" + crypto.randomUUID(), email_confirm: true,
+          email, password: crypto.randomUUID() + "Aa1!", email_confirm: true,
           user_metadata: { full_name: m.name, phone: "+91" + m.phone },
         });
         if (error || !c.user) throw new Error(error?.message ?? "Could not create demo user");

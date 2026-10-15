@@ -30,7 +30,7 @@ export const phoneOtpLogin = createServerFn({ method: "POST" })
 
     if (!prof) {
       if (!data.name || data.name.length < 2) return { error: null, needsName: true, tokenHash: null };
-      const password = crypto.randomUUID() + "Aa1!" + crypto.randomUUID();
+      const password = crypto.randomUUID() + "Aa1!";
       const { error } = await supabaseAdmin.auth.admin.createUser({
         email, password, email_confirm: true,
         user_metadata: { full_name: data.name, phone: full, phone_verified_demo: true },
