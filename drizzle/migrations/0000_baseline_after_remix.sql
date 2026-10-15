@@ -1,1 +1,0 @@
-COMMENT ON SCHEMA public IS 'Baseline: schema exists from project remix; migration history rescaffolded fresh.';

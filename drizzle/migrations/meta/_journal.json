@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1792038637051,
-      "tag": "0000_baseline_after_remix",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1792038990971,
-      "tag": "0001_restore_new_user_trigger",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1792040467501,
-      "tag": "0002_payout_rates_and_bonuses",
+      "when": 1792045980000,
+      "tag": "0000_baseline",
       "breakpoints": true
     }
   ]
