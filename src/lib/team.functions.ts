@@ -6,10 +6,8 @@ const RANK = { admin: 4, distributor: 3, manager: 2, rider: 1 } as const;
 type Role = keyof typeof RANK;
 
 const createSchema = z.object({
-  email: z.string().trim().email().max(255),
-  password: z.string().min(8).max(72),
   full_name: z.string().trim().min(2).max(100),
-  phone: z.string().trim().max(20).optional().default(""),
+  phone: z.string().trim().regex(/^[6-9][0-9]{9}$/, "Enter a valid 10-digit mobile number"),
   role: z.enum(["admin", "distributor", "manager", "rider"]),
   parent_id: z.string().uuid().nullable().optional(),
 });
@@ -42,16 +40,17 @@ export const createMember = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
-      email: data.email,
-      password: data.password,
+      email: `p${data.phone}@phone.bnoy.app`,
+      password: crypto.randomUUID() + "Aa1!" + crypto.randomUUID(),
       email_confirm: true,
-      user_metadata: { full_name: data.full_name, phone: data.phone },
+      user_metadata: { full_name: data.full_name, phone: "+91" + data.phone },
     });
+    if (error && /already/i.test(error.message)) throw new Error("This mobile number is already registered");
     if (error || !created.user) throw new Error(error?.message ?? "Could not create user");
     const id = created.user.id;
     await supabaseAdmin
       .from("profiles")
-      .update({ parent_id: data.role === "admin" ? null : parentId, phone: data.phone || null, full_name: data.full_name })
+      .update({ parent_id: data.role === "admin" ? null : parentId, phone: "+91" + data.phone, full_name: data.full_name })
       .eq("id", id);
     await supabaseAdmin.from("user_roles").delete().eq("user_id", id);
     const { error: rErr } = await supabaseAdmin.from("user_roles").insert({ user_id: id, role: data.role });
