@@ -4,6 +4,7 @@ import { MapPin, Search, Route as RouteIcon } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import { useShipments } from "@/lib/shipments";
+import { CorridorAnalytics } from "@/components/CorridorMap";
 import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/hubs")({
@@ -16,6 +17,7 @@ const BAD = ["failed", "returned", "cancelled"];
 function HubsPage() {
   const { data: rows = [], isLoading } = useShipments();
   const [q, setQ] = useState("");
+  const [now] = useState(() => Date.now());
 
   const { hubs, lanes } = useMemo(() => {
     const h = new Map<string, { total: number; delivered: number; bad: number; open: number; onTime: number; pins: Set<string> }>();
@@ -52,6 +54,8 @@ function HubsPage() {
         <Stat label="Parcels in network" value={rows.length} />
         <Stat label="Open (not finished)" value={hubs.reduce((s, x) => s + x.open, 0)} />
       </div>
+
+      {!isLoading && <CorridorAnalytics rows={rows} now={now} />}
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1.4fr_1fr]">
         <section className="rounded-lg border bg-card shadow-card">

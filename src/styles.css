@@ -233,3 +233,10 @@
   .journey-copy { padding-block: 12px; }
   .journey-stop { margin-left: -48px; }
 }
+
+@media (max-width: 450px) {
+  .hero-brand { font-size: clamp(36px, 11vw, 46px); }
+  .journey-chapter { padding-left: 36px; }
+  .journey-stop { margin-left: -44px; }
+  .journey-copy h3 { font-size: 1.6rem; overflow-wrap: anywhere; }
+}
