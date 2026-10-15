@@ -210,6 +210,72 @@ export type Database = {
           },
         ]
       }
+      payout_bonuses: {
+        Row: {
+          active: boolean
+          created_at: string
+          distributor_bonus: number
+          ends_on: string
+          id: string
+          kind: string
+          manager_bonus: number
+          name: string
+          rider_bonus: number
+          starts_on: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          distributor_bonus?: number
+          ends_on: string
+          id?: string
+          kind?: string
+          manager_bonus?: number
+          name: string
+          rider_bonus?: number
+          starts_on: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          distributor_bonus?: number
+          ends_on?: string
+          id?: string
+          kind?: string
+          manager_bonus?: number
+          name?: string
+          rider_bonus?: number
+          starts_on?: string
+        }
+        Relationships: []
+      }
+      payout_settings: {
+        Row: {
+          distributor_delivery: number
+          id: number
+          manager_delivery: number
+          rider_delivery: number
+          rider_return: number
+          updated_at: string
+        }
+        Insert: {
+          distributor_delivery?: number
+          id?: number
+          manager_delivery?: number
+          rider_delivery?: number
+          rider_return?: number
+          updated_at?: string
+        }
+        Update: {
+          distributor_delivery?: number
+          id?: number
+          manager_delivery?: number
+          rider_delivery?: number
+          rider_return?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
