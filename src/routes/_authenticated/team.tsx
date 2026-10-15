@@ -72,7 +72,7 @@ function TeamPage() {
             <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-md ${m.role ? TONE[m.role] : "bg-muted"}`}><Icon className="h-5 w-5" /></span>
             <div className="min-w-0">
               <p className="truncate font-semibold">{m.full_name}{m.id === user?.id && <span className="ml-2 text-xs text-muted-foreground">(you)</span>}</p>
-              <p className="truncate text-xs text-muted-foreground">{m.role ? ROLE_LABEL[m.role] : "No role"} · {m.email}{m.phone ? ` · ${m.phone}` : ""}</p>
+              <p className="truncate text-xs text-muted-foreground">{m.role ? ROLE_LABEL[m.role] : "No role"}{m.phone ? ` · ${m.phone}` : ""}</p>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -142,10 +142,10 @@ function AddDialog({ open, onClose, team, myRole, myId, defaultParent }: {
     setBusy(true);
     try {
       await create({ data: {
-        email: String(fd.get("email")), password: String(fd.get("password")), full_name: String(fd.get("full_name")),
-        phone: String(fd.get("phone") ?? ""), role, parent_id: role === "admin" ? null : parents.some((p) => p.id === parent) ? parent : myId,
+        full_name: String(fd.get("full_name")),
+        phone: String(fd.get("phone") ?? "").replace(/[^0-9]/g, "").replace(/^91(?=[0-9]{10}$)/, ""), role, parent_id: role === "admin" ? null : parents.some((p) => p.id === parent) ? parent : myId,
       } });
-      toast.success(`${ROLE_LABEL[role]} added. Share the email & password with them.`);
+      toast.success(`${ROLE_LABEL[role]} added. They can sign in with their mobile number and OTP.`);
       qc.invalidateQueries({ queryKey: ["team"] });
       onClose();
     } catch (err) {
@@ -178,11 +178,7 @@ function AddDialog({ open, onClose, team, myRole, myId, defaultParent }: {
             </div>
           )}
           <div className="space-y-1.5"><Label htmlFor="full_name">Full name</Label><Input id="full_name" name="full_name" required minLength={2} maxLength={100} /></div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5"><Label htmlFor="email">Email (login)</Label><Input id="email" name="email" type="email" required /></div>
-            <div className="space-y-1.5"><Label htmlFor="phone">Phone</Label><Input id="phone" name="phone" maxLength={20} /></div>
-          </div>
-          <div className="space-y-1.5"><Label htmlFor="password">Temporary password</Label><Input id="password" name="password" type="text" required minLength={8} maxLength={72} /></div>
+          <div className="space-y-1.5"><Label htmlFor="phone">Mobile number (login)</Label><Input id="phone" name="phone" type="tel" inputMode="numeric" required maxLength={13} placeholder="10-digit mobile" /><p className="text-xs text-muted-foreground">They sign in with this number and an OTP — no password needed.</p></div>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
             <Button type="submit" variant="hero" disabled={busy}>{busy && <Loader2 className="animate-spin" />} Add {ROLE_LABEL[role]}</Button>

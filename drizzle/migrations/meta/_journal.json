@@ -15,6 +15,13 @@
       "when": 1792033988547,
       "tag": "0001_cancel_otp_no_dup_event",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792034746239,
+      "tag": "0002_phone_login_and_perf",
+      "breakpoints": true
     }
   ]
 }
