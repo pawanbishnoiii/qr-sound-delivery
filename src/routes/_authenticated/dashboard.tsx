@@ -2,6 +2,7 @@ import { pageHead } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Package, Truck, CheckCircle2, IndianRupee, ScanLine, Plus, Users } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { RiderHome } from "@/components/RiderHome";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { useMe, useTeam } from "@/lib/auth";
@@ -14,6 +15,11 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function Dashboard() {
+  const { role } = useMe();
+  return role === "rider" ? <RiderHome /> : <LeadDashboard />;
+}
+
+function LeadDashboard() {
   const { role, profile } = useMe();
   const { data: rows = [], isLoading } = useShipments();
   const { data: team = [] } = useTeam();
