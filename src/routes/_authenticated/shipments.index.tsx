@@ -5,7 +5,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { Plus, Search, Loader2, Package, Sparkles, Printer } from "lucide-react";
 import { SeedDialog } from "@/components/SeedDialog";
-import { printLabels } from "@/lib/labels";
+import { printLabels, printLabelSheet, SHEET_LAYOUTS } from "@/lib/labels";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { StatusBadge } from "@/components/StatusBadge";
