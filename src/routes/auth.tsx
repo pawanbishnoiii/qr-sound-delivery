@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { phoneEmail, signUpWithPhone } from "@/lib/phone-auth.functions";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +28,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const phoneSignUp = useServerFn(signUpWithPhone);
   const [mode, setMode] = useState<"in" | "up">("in");
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({ email: "", password: "", name: "", phone: "" });
@@ -43,8 +46,11 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "in") {
-        const { error } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
-        if (error) throw error;
+        const id = form.email.trim();
+        const digits = id.replace(/[^0-9]/g, "").replace(/^91(?=[6-9][0-9]{9}$)/, "");
+        const email = id.includes("@") ? id : /^[6-9][0-9]{9}$/.test(digits) ? phoneEmail(digits) : id;
+        const { error } = await supabase.auth.signInWithPassword({ email, password: form.password });
+        if (error) throw new Error(id.includes("@") ? error.message : "Wrong mobile number or password");
         navigate({ to: "/dashboard", replace: true });
       } else {
         if (form.password.length < 8) throw new Error("Password must be at least 8 characters");
@@ -52,6 +58,14 @@ function AuthPage() {
         if (!/^[6-9][0-9]{9}$/.test(phone)) throw new Error("Enter a valid 10-digit mobile number");
         if (!otpSent) { setOtpSent(true); toast.success("OTP sent to +91 " + phone + " (demo OTP: 1234)"); return; }
         if (otp !== "1234") throw new Error("Incorrect OTP");
+        if (!form.email.trim()) {
+          const r = await phoneSignUp({ data: { phone, name: form.name, password: form.password, otp } });
+          if (r.error) throw new Error(r.error);
+          const { error } = await supabase.auth.signInWithPassword({ email: phoneEmail(phone), password: form.password });
+          if (error) throw error;
+          navigate({ to: "/dashboard", replace: true });
+          return;
+        }
         const { data, error } = await supabase.auth.signUp({
           email: form.email,
           password: form.password,
@@ -112,8 +126,8 @@ function AuthPage() {
               </div>
             )}
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+              <Label htmlFor="email">{mode === "in" ? "Email or mobile number" : "Email (optional)"}</Label>
+              <Input id="email" type={mode === "in" ? "text" : "email"} required={mode === "in"} autoComplete="username" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="pw">Password</Label>
