@@ -21,6 +21,7 @@ import { Route as AuthenticatedDevelopersRouteImport } from './routes/_authentic
 import { Route as AuthenticatedLotsRouteImport } from './routes/_authenticated/lots'
 import { Route as AuthenticatedProvidersRouteImport } from './routes/_authenticated/providers'
 import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
+import { Route as AuthenticatedRidersRouteImport } from './routes/_authenticated/riders'
 import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
 import { Route as AuthenticatedShipmentsIndexRouteImport } from './routes/_authenticated/shipments.index'
@@ -89,6 +90,11 @@ const AuthenticatedReturnsRoute = AuthenticatedReturnsRouteImport.update({
   path: '/returns',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRidersRoute = AuthenticatedRidersRouteImport.update({
+  id: '/riders',
+  path: '/riders',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedScanRoute = AuthenticatedScanRouteImport.update({
   id: '/scan',
   path: '/scan',
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/lots': typeof AuthenticatedLotsRoute
   '/providers': typeof AuthenticatedProvidersRoute
   '/returns': typeof AuthenticatedReturnsRoute
+  '/riders': typeof AuthenticatedRidersRoute
   '/scan': typeof AuthenticatedScanRoute
   '/team': typeof AuthenticatedTeamRoute
   '/shipments/$id': typeof AuthenticatedShipmentsIdRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByTo {
   '/lots': typeof AuthenticatedLotsRoute
   '/providers': typeof AuthenticatedProvidersRoute
   '/returns': typeof AuthenticatedReturnsRoute
+  '/riders': typeof AuthenticatedRidersRoute
   '/scan': typeof AuthenticatedScanRoute
   '/team': typeof AuthenticatedTeamRoute
   '/shipments/$id': typeof AuthenticatedShipmentsIdRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/_authenticated/lots': typeof AuthenticatedLotsRoute
   '/_authenticated/providers': typeof AuthenticatedProvidersRoute
   '/_authenticated/returns': typeof AuthenticatedReturnsRoute
+  '/_authenticated/riders': typeof AuthenticatedRidersRoute
   '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/_authenticated/shipments/$id': typeof AuthenticatedShipmentsIdRoute
@@ -212,6 +221,7 @@ export interface FileRouteTypes {
     | '/lots'
     | '/providers'
     | '/returns'
+    | '/riders'
     | '/scan'
     | '/team'
     | '/shipments/$id'
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | '/lots'
     | '/providers'
     | '/returns'
+    | '/riders'
     | '/scan'
     | '/team'
     | '/shipments/$id'
@@ -255,6 +266,7 @@ export interface FileRouteTypes {
     | '/_authenticated/lots'
     | '/_authenticated/providers'
     | '/_authenticated/returns'
+    | '/_authenticated/riders'
     | '/_authenticated/scan'
     | '/_authenticated/team'
     | '/_authenticated/shipments/$id'
@@ -365,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReturnsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/riders': {
+      id: '/_authenticated/riders'
+      path: '/riders'
+      fullPath: '/riders'
+      preLoaderRoute: typeof AuthenticatedRidersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/scan': {
       id: '/_authenticated/scan'
       path: '/scan'
@@ -430,6 +449,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLotsRoute: typeof AuthenticatedLotsRoute
   AuthenticatedProvidersRoute: typeof AuthenticatedProvidersRoute
   AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
+  AuthenticatedRidersRoute: typeof AuthenticatedRidersRoute
   AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
   AuthenticatedShipmentsIdRoute: typeof AuthenticatedShipmentsIdRoute
@@ -442,6 +462,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLotsRoute: AuthenticatedLotsRoute,
   AuthenticatedProvidersRoute: AuthenticatedProvidersRoute,
   AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
+  AuthenticatedRidersRoute: AuthenticatedRidersRoute,
   AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
   AuthenticatedShipmentsIdRoute: AuthenticatedShipmentsIdRoute,
