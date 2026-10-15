@@ -2,27 +2,43 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 export const phoneEmail = (phone: string) => `p${phone}@phone.bnoy.app`;
+export const DEMO_OTP = "1234";
 
-const schema = z.object({
+const loginSchema = z.object({
   phone: z.string().regex(/^[6-9][0-9]{9}$/),
-  name: z.string().trim().min(2).max(120),
-  password: z.string().min(8).max(72),
   otp: z.string().regex(/^[0-9]{4}$/),
+  name: z.string().trim().max(120).optional(),
 });
 
-/** Phone-only signup. DEMO: OTP is fixed (1234) until an SMS provider is connected. */
-export const signUpWithPhone = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => schema.parse(d))
+/**
+ * Mobile + OTP sign-in / sign-up. DEMO: OTP is fixed (1234) until an SMS provider is connected.
+ * Returns a one-time token hash the browser exchanges for a session via verifyOtp.
+ */
+export const phoneOtpLogin = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => loginSchema.parse(d))
   .handler(async ({ data }) => {
-    if (data.otp !== "1234") return { error: "Incorrect OTP" };
+    if (data.otp !== DEMO_OTP) return { error: "Incorrect OTP", needsName: false, tokenHash: null };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.auth.admin.createUser({
-      email: phoneEmail(data.phone),
-      password: data.password,
-      email_confirm: true,
-      user_metadata: { full_name: data.name, phone: "+91" + data.phone, phone_verified_demo: true },
-    });
-    if (error) console.error("phone signup failed:", error.message);
-    if (error) return { error: /already/i.test(error.message) ? "This number is already registered — sign in instead" : error.message };
-    return { error: null };
+    const full = "+91" + data.phone;
+
+    // Existing account linked to this number (also covers staff added by admins).
+    const { data: prof } = await supabaseAdmin
+      .from("profiles").select("email").in("phone", [full, data.phone]).not("email", "is", null).limit(1).maybeSingle();
+    let email = prof?.email ?? phoneEmail(data.phone);
+
+    if (!prof) {
+      const { data: link } = await supabaseAdmin.auth.admin.generateLink({ type: "magiclink", email });
+      if (link?.properties?.hashed_token) return { error: null, needsName: false, tokenHash: link.properties.hashed_token };
+      if (!data.name || data.name.length < 2) return { error: null, needsName: true, tokenHash: null };
+      const password = crypto.randomUUID() + "Aa1!" + crypto.randomUUID();
+      const { error } = await supabaseAdmin.auth.admin.createUser({
+        email, password, email_confirm: true,
+        user_metadata: { full_name: data.name, phone: full, phone_verified_demo: true },
+      });
+      if (error) { console.error("phone signup failed:", error.message); return { error: error.message, needsName: false, tokenHash: null }; }
+    }
+    const { data: link, error } = await supabaseAdmin.auth.admin.generateLink({ type: "magiclink", email });
+    if (error || !link?.properties?.hashed_token) return { error: error?.message ?? "Could not sign in", needsName: false, tokenHash: null };
+    email = "";
+    return { error: null, needsName: false, tokenHash: link.properties.hashed_token };
   });
