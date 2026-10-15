@@ -53,8 +53,7 @@ export const Route = createFileRoute("/api/public/v1/shipments")({
         if (!parsed.success) return Response.json({ error: "Invalid order", issues: parsed.error.issues.slice(0, 5) }, { status: 400, headers: cors });
         const { data, error } = await a.db.from("shipments").insert(parsed.data.map((o) => ({ ...o, pincode: o.pincode ?? null, external_order_id: o.external_order_id ?? null, notes: o.notes ?? null, created_by: a.created_by }))).select(COLS);
         if (error) return Response.json({ error: "Could not create shipments" }, { status: 500, headers: cors });
-        const { dispatchEvent } = await import("@/lib/webhooks.server");
-        for (const s of data ?? []) await dispatchEvent("shipment.created", s);
+        // shipment.created webhooks are queued by a database trigger and delivered by the outbox job.
         return Response.json({ data }, { status: 201, headers: cors });
       },
     },

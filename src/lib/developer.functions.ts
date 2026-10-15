@@ -46,13 +46,23 @@ export const testWebhook = createServerFn({ method: "POST" })
     return r[0] ?? { ok: false, status: null };
   });
 
-/** Notify subscribers after an in-app status change (caller must be able to see the shipment). */
-export const notifyShipmentChange = createServerFn({ method: "POST" })
+/** Admin: deliver queued webhooks right now instead of waiting for the next scheduled run. */
+export const flushWebhooks = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { processOutbox } = await import("./webhooks.server");
+    return processOutbox();
+  });
+
+/** Admin: re-queue a failed delivery. */
+export const retryWebhook = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v: unknown) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ data, context }) => {
-    const { data: s } = await context.supabase.from("shipments").select("id,tracking_code,status,updated_at").eq("id", data.id).maybeSingle();
-    if (!s) return { sent: 0 };
-    const { dispatchEvent } = await import("./webhooks.server");
-    return { sent: (await dispatchEvent("shipment.updated", s)).length };
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("webhook_outbox").update({ status: "pending", next_attempt_at: new Date().toISOString(), max_attempts: 6, attempts: 0 }).eq("id", data.id).in("status", ["failed", "cancelled"]);
+    if (error) throw new Error("Could not retry");
+    return { ok: true };
   });

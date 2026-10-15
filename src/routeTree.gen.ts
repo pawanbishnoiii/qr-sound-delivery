@@ -25,6 +25,7 @@ import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/s
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
 import { Route as AuthenticatedShipmentsIndexRouteImport } from './routes/_authenticated/shipments.index'
 import { Route as AuthenticatedShipmentsIdRouteImport } from './routes/_authenticated/shipments.$id'
+import { Route as ApiPublicJobsWebhooksRouteImport } from './routes/api/public/jobs/webhooks'
 import { Route as ApiPublicTrackCodeRouteImport } from './routes/api/public/track.$code'
 import { Route as ApiPublicV1ShipmentsRouteImport } from './routes/api/public/v1/shipments'
 import { Route as ApiPublicCouriersPartnerIdWebhookRouteImport } from './routes/api/public/couriers.$partnerId.webhook'
@@ -110,6 +111,11 @@ const AuthenticatedShipmentsIdRoute =
     path: '/shipments/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicJobsWebhooksRoute = ApiPublicJobsWebhooksRouteImport.update({
+  id: '/api/public/jobs/webhooks',
+  path: '/api/public/jobs/webhooks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicTrackCodeRoute = ApiPublicTrackCodeRouteImport.update({
   id: '/api/public/track/$code',
   path: '/api/public/track/$code',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/team': typeof AuthenticatedTeamRoute
   '/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/shipments/': typeof AuthenticatedShipmentsIndexRoute
+  '/api/public/jobs/webhooks': typeof ApiPublicJobsWebhooksRoute
   '/api/public/track/$code': typeof ApiPublicTrackCodeRoute
   '/api/public/v1/shipments': typeof ApiPublicV1ShipmentsRoute
   '/api/public/couriers/$partnerId/webhook': typeof ApiPublicCouriersPartnerIdWebhookRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/team': typeof AuthenticatedTeamRoute
   '/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/shipments': typeof AuthenticatedShipmentsIndexRoute
+  '/api/public/jobs/webhooks': typeof ApiPublicJobsWebhooksRoute
   '/api/public/track/$code': typeof ApiPublicTrackCodeRoute
   '/api/public/v1/shipments': typeof ApiPublicV1ShipmentsRoute
   '/api/public/couriers/$partnerId/webhook': typeof ApiPublicCouriersPartnerIdWebhookRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/_authenticated/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/_authenticated/shipments/': typeof AuthenticatedShipmentsIndexRoute
+  '/api/public/jobs/webhooks': typeof ApiPublicJobsWebhooksRoute
   '/api/public/track/$code': typeof ApiPublicTrackCodeRoute
   '/api/public/v1/shipments': typeof ApiPublicV1ShipmentsRoute
   '/api/public/couriers/$partnerId/webhook': typeof ApiPublicCouriersPartnerIdWebhookRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/team'
     | '/shipments/$id'
     | '/shipments/'
+    | '/api/public/jobs/webhooks'
     | '/api/public/track/$code'
     | '/api/public/v1/shipments'
     | '/api/public/couriers/$partnerId/webhook'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/team'
     | '/shipments/$id'
     | '/shipments'
+    | '/api/public/jobs/webhooks'
     | '/api/public/track/$code'
     | '/api/public/v1/shipments'
     | '/api/public/couriers/$partnerId/webhook'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/_authenticated/team'
     | '/_authenticated/shipments/$id'
     | '/_authenticated/shipments/'
+    | '/api/public/jobs/webhooks'
     | '/api/public/track/$code'
     | '/api/public/v1/shipments'
     | '/api/public/couriers/$partnerId/webhook'
@@ -261,6 +273,7 @@ export interface RootRouteChildren {
   ResourcesRoute: typeof ResourcesRoute
   SolutionsRoute: typeof SolutionsRoute
   TrackRoute: typeof TrackRoute
+  ApiPublicJobsWebhooksRoute: typeof ApiPublicJobsWebhooksRoute
   ApiPublicTrackCodeRoute: typeof ApiPublicTrackCodeRoute
   ApiPublicV1ShipmentsRoute: typeof ApiPublicV1ShipmentsRoute
   ApiPublicCouriersPartnerIdWebhookRoute: typeof ApiPublicCouriersPartnerIdWebhookRoute
@@ -380,6 +393,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShipmentsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/jobs/webhooks': {
+      id: '/api/public/jobs/webhooks'
+      path: '/api/public/jobs/webhooks'
+      fullPath: '/api/public/jobs/webhooks'
+      preLoaderRoute: typeof ApiPublicJobsWebhooksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/track/$code': {
       id: '/api/public/track/$code'
       path: '/api/public/track/$code'
@@ -439,6 +459,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResourcesRoute: ResourcesRoute,
   SolutionsRoute: SolutionsRoute,
   TrackRoute: TrackRoute,
+  ApiPublicJobsWebhooksRoute: ApiPublicJobsWebhooksRoute,
   ApiPublicTrackCodeRoute: ApiPublicTrackCodeRoute,
   ApiPublicV1ShipmentsRoute: ApiPublicV1ShipmentsRoute,
   ApiPublicCouriersPartnerIdWebhookRoute:
