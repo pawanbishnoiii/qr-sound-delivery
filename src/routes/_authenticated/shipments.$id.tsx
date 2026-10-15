@@ -9,6 +9,7 @@ import { AppShell } from "@/components/AppShell";
 import { StatusBadge } from "@/components/StatusBadge";
 import { QrCode } from "@/components/QrCode";
 import { Barcode } from "@/components/Barcode";
+import { AiIssueAssist } from "@/components/AiIssueAssist";
 import { OtpDialog } from "@/components/OtpDialog";
 import { CancelOtpDialog } from "@/components/CancelOtpDialog";
 import { FileText, Star } from "lucide-react";
@@ -123,6 +124,8 @@ function Detail() {
             </dl>
             {s.notes && <p className="mt-4 rounded-lg bg-muted p-3 text-sm">{s.notes}</p>}
           </section>
+
+          {role !== "rider" && <AiIssueAssist shipmentId={s.id} />}
 
           <section className="rounded-lg border bg-card p-5 shadow-card">
             <h2 className="font-bold">Actions</h2>

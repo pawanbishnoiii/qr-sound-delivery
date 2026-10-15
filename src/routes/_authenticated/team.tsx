@@ -4,12 +4,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { UserPlus, Trash2, Loader2, Crown, Building2, Briefcase, Bike } from "lucide-react";
+import { UserPlus, Trash2, Loader2, Search, Package, CheckCircle2, Crown, Building2, Briefcase, Bike } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useShipments } from "@/lib/shipments";
 import { useMe, useTeam, type TeamMember } from "@/lib/auth";
 import { createMember, moveMember, removeMember } from "@/lib/team.functions";
 import { selectCls } from "@/lib/ui";
@@ -36,6 +37,23 @@ function TeamPage() {
   const move = useServerFn(moveMember);
   const [open, setOpen] = useState(false);
   const [parentFor, setParentFor] = useState<string | null>(null);
+  const { data: ships = [] } = useShipments();
+  const [q, setQ] = useState("");
+  const [tab, setTab] = useState<"all" | AppRole>("all");
+  const stats = useMemo(() => {
+    const m = new Map<string, { active: number; delivered: number }>();
+    const bump = (id: string | null, st: string) => {
+      if (!id) return;
+      const g = m.get(id) ?? { active: 0, delivered: 0 };
+      if (st === "delivered") g.delivered++;
+      else if (!["failed", "returned", "cancelled", "created"].includes(st)) g.active++;
+      m.set(id, g);
+    };
+    for (const r of ships) { bump(r.rider_id, r.status); if (r.manager_id !== r.rider_id) bump(r.manager_id, r.status); if (r.distributor_id !== r.manager_id) bump(r.distributor_id, r.status); }
+    return m;
+  }, [ships]);
+  const filtering = q.trim() !== "" || tab !== "all";
+  const flat = team.filter((t) => (tab === "all" || t.role === tab) && `${t.full_name} ${t.phone ?? ""}`.toLowerCase().includes(q.trim().toLowerCase()));
 
   const ids = new Set(team.map((t) => t.id));
   const children = useMemo(() => {
@@ -73,6 +91,7 @@ function TeamPage() {
             <div className="min-w-0">
               <p className="truncate font-semibold">{m.full_name}{m.id === user?.id && <span className="ml-2 text-xs text-muted-foreground">(you)</span>}</p>
               <p className="truncate text-xs text-muted-foreground">{m.role ? ROLE_LABEL[m.role] : "No role"}{m.phone ? ` · ${m.phone}` : ""}</p>
+              <p className="mt-1 flex gap-3 text-xs"><span className="flex items-center gap-1 text-primary"><Package className="h-3 w-3" />{stats.get(m.id)?.active ?? 0} active</span><span className="flex items-center gap-1 text-muted-foreground"><CheckCircle2 className="h-3 w-3" />{stats.get(m.id)?.delivered ?? 0} delivered</span></p>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -87,7 +106,7 @@ function TeamPage() {
             {editable && <Button size="sm" variant="ghost" className="text-destructive" onClick={() => onRemove(m)} aria-label="Remove"><Trash2 /></Button>}
           </div>
         </div>
-        {kids.length > 0 && <ul className="mt-2 space-y-2">{kids.map((k) => <Node key={k.id} m={k} depth={depth + 1} />)}</ul>}
+        {!filtering && kids.length > 0 && <ul className="mt-2 space-y-2">{kids.map((k) => <Node key={k.id} m={k} depth={depth + 1} />)}</ul>}
       </li>
     );
   }
@@ -97,7 +116,7 @@ function TeamPage() {
       title="Team"
       actions={canManage && <Button variant="hero" size="sm" onClick={() => { setParentFor(null); setOpen(true); }}><UserPlus /> <span className="hidden sm:inline">Add member</span></Button>}
     >
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
         {counts.map(({ r, n }) => {
           const Icon = ICON[r];
           return (
@@ -109,8 +128,20 @@ function TeamPage() {
           );
         })}
       </div>
-      <h2 className="mt-8 mb-3 font-bold">Hierarchy</h2>
-      {isLoading ? <Loader2 className="animate-spin" /> : (
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="font-bold">{filtering ? `${flat.length} member${flat.length === 1 ? "" : "s"}` : "Admin → Distributor → Manager → Rider"}</h2>
+        <div className="relative sm:w-64"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name or mobile" className="pl-9" aria-label="Search team" /></div>
+      </div>
+      <div className="mt-3 mb-4 flex gap-2 overflow-x-auto pb-1">
+        {(["all", "admin", "distributor", "manager", "rider"] as const).map((r) => (
+          <button key={r} onClick={() => setTab(r)} className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold ${tab === r ? "border-primary bg-primary text-primary-foreground" : "bg-card"}`}>
+            {r === "all" ? "All" : `${ROLE_LABEL[r]}s`} <span className="opacity-70">{r === "all" ? team.length : team.filter((t) => t.role === r).length}</span>
+          </button>
+        ))}
+      </div>
+      {isLoading ? <Loader2 className="animate-spin" /> : filtering ? (
+        flat.length === 0 ? <p className="text-sm text-muted-foreground">No members match.</p> : <ul className="space-y-2">{flat.map((m) => <Node key={m.id} m={m} depth={0} />)}</ul>
+      ) : (
         <ul className="space-y-2">{(children.get(null) ?? []).map((m) => <Node key={m.id} m={m} depth={0} />)}</ul>
       )}
       {canManage && role && user && <AddDialog open={open} onClose={() => setOpen(false)} team={team} myRole={role} myId={user.id} defaultParent={parentFor} />}
