@@ -1,5 +1,10 @@
 # Bnoy Logistics upgrade
 
+## Landing page completion
+- [ ] Finish headline reveals using the existing display fonts.
+- [ ] Add the scroll-drawn route and illustrated parcel journey.
+- [ ] Verify tracking, navigation, reduced motion, and mobile layouts.
+
 - [x] Audit existing workflows and official integration documentation.
 - [x] Refresh brand, design tokens, public experience and operational shell with GSAP.
 - [x] Generate and integrate 11 individual logistics photographs.
