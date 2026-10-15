@@ -72,7 +72,7 @@ function TeamPage() {
             <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-md ${m.role ? TONE[m.role] : "bg-muted"}`}><Icon className="h-5 w-5" /></span>
             <div className="min-w-0">
               <p className="truncate font-semibold">{m.full_name}{m.id === user?.id && <span className="ml-2 text-xs text-muted-foreground">(you)</span>}</p>
-              <p className="truncate text-xs text-muted-foreground">{m.role ? ROLE_LABEL[m.role] : "No role"} · {m.email}{m.phone ? ` · ${m.phone}` : ""}</p>
+              <p className="truncate text-xs text-muted-foreground">{m.role ? ROLE_LABEL[m.role] : "No role"}{m.phone ? ` · ${m.phone}` : ""}</p>
             </div>
           </div>
           <div className="flex items-center gap-1">
