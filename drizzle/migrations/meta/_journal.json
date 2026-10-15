@@ -36,6 +36,13 @@
       "when": 1792001913800,
       "tag": "0004_return_photo_storage_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792028891842,
+      "tag": "0005_security_and_webhook_outbox",
+      "breakpoints": true
     }
   ]
 }

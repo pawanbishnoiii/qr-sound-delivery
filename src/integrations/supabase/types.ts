@@ -582,30 +582,45 @@ export type Database = {
       }
       webhook_deliveries: {
         Row: {
+          attempt: number
           created_at: string
+          duration_ms: number | null
           endpoint_id: string
           error: string | null
           event: string
           id: string
           ok: boolean
+          outbox_id: string | null
+          request_body: Json | null
+          response_body: string | null
           status_code: number | null
         }
         Insert: {
+          attempt?: number
           created_at?: string
+          duration_ms?: number | null
           endpoint_id: string
           error?: string | null
           event: string
           id?: string
           ok?: boolean
+          outbox_id?: string | null
+          request_body?: Json | null
+          response_body?: string | null
           status_code?: number | null
         }
         Update: {
+          attempt?: number
           created_at?: string
+          duration_ms?: number | null
           endpoint_id?: string
           error?: string | null
           event?: string
           id?: string
           ok?: boolean
+          outbox_id?: string | null
+          request_body?: Json | null
+          response_body?: string | null
           status_code?: number | null
         }
         Relationships: [
@@ -614,6 +629,13 @@ export type Database = {
             columns: ["endpoint_id"]
             isOneToOne: false
             referencedRelation: "webhook_endpoints"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "webhook_deliveries_outbox_id_fkey"
+            columns: ["outbox_id"]
+            isOneToOne: false
+            referencedRelation: "webhook_outbox"
             referencedColumns: ["id"]
           },
         ]
@@ -656,6 +678,56 @@ export type Database = {
           url?: string
         }
         Relationships: []
+      }
+      webhook_outbox: {
+        Row: {
+          attempts: number
+          created_at: string
+          delivered_at: string | null
+          endpoint_id: string
+          event: string
+          id: string
+          last_error: string | null
+          max_attempts: number
+          next_attempt_at: string
+          payload: Json
+          status: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          delivered_at?: string | null
+          endpoint_id: string
+          event: string
+          id?: string
+          last_error?: string | null
+          max_attempts?: number
+          next_attempt_at?: string
+          payload: Json
+          status?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          delivered_at?: string | null
+          endpoint_id?: string
+          event?: string
+          id?: string
+          last_error?: string | null
+          max_attempts?: number
+          next_attempt_at?: string
+          payload?: Json
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_outbox_endpoint_id_fkey"
+            columns: ["endpoint_id"]
+            isOneToOne: false
+            referencedRelation: "webhook_endpoints"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -754,6 +826,10 @@ export type Database = {
       duplicate_shipment: {
         Args: { _copies: number; _id: string }
         Returns: number
+      }
+      enqueue_webhook: {
+        Args: { _data: Json; _event: string }
+        Returns: undefined
       }
       get_user_role: {
         Args: { _user_id: string }
