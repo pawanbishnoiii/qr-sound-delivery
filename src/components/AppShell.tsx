@@ -28,7 +28,7 @@ const GROUPS = [
   ] },
   { title: "Network & settings", items: [
     { to: "/team", label: "Team", icon: Users, roles: LEADS },
-    { to: "/payouts", label: "Pay & bonuses", icon: Wallet, roles: LEADS },
+    { to: "/payouts", label: "Pay & bonuses", icon: Wallet, roles: ADMIN },
     { to: "/providers", label: "Courier partners", icon: Plug, roles: ADMIN },
     { to: "/developers", label: "API & webhooks", icon: KeyRound, roles: ADMIN },
   ] },
