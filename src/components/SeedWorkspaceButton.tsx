@@ -16,7 +16,6 @@ export function SeedWorkspaceButton() {
       size="sm"
       disabled={busy}
       onClick={async () => {
-        if (!confirm("Add a demo team (distributor, manager, 3 riders) and sample shipments?")) return;
         setBusy(true);
         try {
           await seed();
