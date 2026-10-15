@@ -40,7 +40,7 @@ export const seedDemoWorkspace = createServerFn({ method: "POST" })
         id = c.user.id; createdUsers++;
       }
       ids[m.phone] = id;
-      await supabaseAdmin.from("profiles").update({ parent_id: m.parent ? ids[m.parent] : userId, phone: "+91" + m.phone, full_name: m.name }).eq("id", id);
+      await supabaseAdmin.from("profiles").update({ parent_id: (m.parent ? ids[m.parent] : userId) ?? null, phone: "+91" + m.phone, full_name: m.name }).eq("id", id);
       await supabaseAdmin.from("user_roles").delete().eq("user_id", id);
       await supabaseAdmin.from("user_roles").insert({ user_id: id, role: m.role });
     }
