@@ -3,7 +3,7 @@ import { ArrowUpRight, Menu, X, ArrowRight } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { Brand } from './Brand';
 import { Button } from './ui/button';
-const links = [{ to: '/solutions', label: 'Solutions' }, { to: '/integrations', label: 'Integrations' }, { to: '/resources', label: 'Resources' }] as const;
+const links = [{ to: '/solutions', label: 'Solutions' }, { to: '/integrations', label: 'Integrations' }, { to: '/resources', label: 'Resources' }, { to: '/docs/api', label: 'API docs' }] as const;
 export function PublicShell({ children }: { children: ReactNode }) {
  const [open,setOpen]=useState(false);
  return <div className="min-h-screen bg-background">

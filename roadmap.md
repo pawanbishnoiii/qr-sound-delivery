@@ -15,3 +15,14 @@
 - Live courier credentials and provider-approved callback authentication are required before real partner traffic.
 - The uploaded enterprise specification spans later phases (tenant migration, finance, phone authentication, maps); preserve existing flows during this focused upgrade.- [x] Phone + demo OTP signup, returns/cancellations with photos and live location, partner API keys and signed webhooks.
 - [ ] Real SMS OTP — blocked on an SMS provider account.
+
+## Rider app & admin upgrade (Oct 2026)
+- [x] Rider wallet (auto ₹15 per delivery/return, none on cancel), ratings, daily accuracy
+- [x] Rider app-style home with call/deliver/cancel
+- [x] Cancel only with customer OTP (demo 1234)
+- [x] Phone-only signup + login with mobile number (demo OTP)
+- [x] Rider performance page for team leads
+- [x] API docs + B2B docs pages, printable bill, A4 barcode sheets
+- [ ] Real SMS OTP — needs SMS provider account
+- [ ] Live Shiprocket/Delhivery/Ekart sync — needs partner credentials
+- [ ] Wallet payouts/withdrawals — needs payout rules from owner

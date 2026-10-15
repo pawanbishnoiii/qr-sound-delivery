@@ -21,8 +21,11 @@ import { Route as AuthenticatedDevelopersRouteImport } from './routes/_authentic
 import { Route as AuthenticatedLotsRouteImport } from './routes/_authenticated/lots'
 import { Route as AuthenticatedProvidersRouteImport } from './routes/_authenticated/providers'
 import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
+import { Route as AuthenticatedRidersRouteImport } from './routes/_authenticated/riders'
 import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
+import { Route as DocsApiRouteImport } from './routes/docs.api'
+import { Route as DocsB2bRouteImport } from './routes/docs.b2b'
 import { Route as AuthenticatedShipmentsIndexRouteImport } from './routes/_authenticated/shipments.index'
 import { Route as AuthenticatedShipmentsIdRouteImport } from './routes/_authenticated/shipments.$id'
 import { Route as ApiPublicJobsWebhooksRouteImport } from './routes/api/public/jobs/webhooks'
@@ -89,6 +92,11 @@ const AuthenticatedReturnsRoute = AuthenticatedReturnsRouteImport.update({
   path: '/returns',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRidersRoute = AuthenticatedRidersRouteImport.update({
+  id: '/riders',
+  path: '/riders',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedScanRoute = AuthenticatedScanRouteImport.update({
   id: '/scan',
   path: '/scan',
@@ -98,6 +106,16 @@ const AuthenticatedTeamRoute = AuthenticatedTeamRouteImport.update({
   id: '/team',
   path: '/team',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const DocsApiRoute = DocsApiRouteImport.update({
+  id: '/docs/api',
+  path: '/docs/api',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsB2bRoute = DocsB2bRouteImport.update({
+  id: '/docs/b2b',
+  path: '/docs/b2b',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedShipmentsIndexRoute =
   AuthenticatedShipmentsIndexRouteImport.update({
@@ -145,8 +163,11 @@ export interface FileRoutesByFullPath {
   '/lots': typeof AuthenticatedLotsRoute
   '/providers': typeof AuthenticatedProvidersRoute
   '/returns': typeof AuthenticatedReturnsRoute
+  '/riders': typeof AuthenticatedRidersRoute
   '/scan': typeof AuthenticatedScanRoute
   '/team': typeof AuthenticatedTeamRoute
+  '/docs/api': typeof DocsApiRoute
+  '/docs/b2b': typeof DocsB2bRoute
   '/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/shipments/': typeof AuthenticatedShipmentsIndexRoute
   '/api/public/jobs/webhooks': typeof ApiPublicJobsWebhooksRoute
@@ -166,8 +187,11 @@ export interface FileRoutesByTo {
   '/lots': typeof AuthenticatedLotsRoute
   '/providers': typeof AuthenticatedProvidersRoute
   '/returns': typeof AuthenticatedReturnsRoute
+  '/riders': typeof AuthenticatedRidersRoute
   '/scan': typeof AuthenticatedScanRoute
   '/team': typeof AuthenticatedTeamRoute
+  '/docs/api': typeof DocsApiRoute
+  '/docs/b2b': typeof DocsB2bRoute
   '/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/shipments': typeof AuthenticatedShipmentsIndexRoute
   '/api/public/jobs/webhooks': typeof ApiPublicJobsWebhooksRoute
@@ -189,8 +213,11 @@ export interface FileRoutesById {
   '/_authenticated/lots': typeof AuthenticatedLotsRoute
   '/_authenticated/providers': typeof AuthenticatedProvidersRoute
   '/_authenticated/returns': typeof AuthenticatedReturnsRoute
+  '/_authenticated/riders': typeof AuthenticatedRidersRoute
   '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
+  '/docs/api': typeof DocsApiRoute
+  '/docs/b2b': typeof DocsB2bRoute
   '/_authenticated/shipments/$id': typeof AuthenticatedShipmentsIdRoute
   '/_authenticated/shipments/': typeof AuthenticatedShipmentsIndexRoute
   '/api/public/jobs/webhooks': typeof ApiPublicJobsWebhooksRoute
@@ -212,8 +239,11 @@ export interface FileRouteTypes {
     | '/lots'
     | '/providers'
     | '/returns'
+    | '/riders'
     | '/scan'
     | '/team'
+    | '/docs/api'
+    | '/docs/b2b'
     | '/shipments/$id'
     | '/shipments/'
     | '/api/public/jobs/webhooks'
@@ -233,8 +263,11 @@ export interface FileRouteTypes {
     | '/lots'
     | '/providers'
     | '/returns'
+    | '/riders'
     | '/scan'
     | '/team'
+    | '/docs/api'
+    | '/docs/b2b'
     | '/shipments/$id'
     | '/shipments'
     | '/api/public/jobs/webhooks'
@@ -255,8 +288,11 @@ export interface FileRouteTypes {
     | '/_authenticated/lots'
     | '/_authenticated/providers'
     | '/_authenticated/returns'
+    | '/_authenticated/riders'
     | '/_authenticated/scan'
     | '/_authenticated/team'
+    | '/docs/api'
+    | '/docs/b2b'
     | '/_authenticated/shipments/$id'
     | '/_authenticated/shipments/'
     | '/api/public/jobs/webhooks'
@@ -273,6 +309,8 @@ export interface RootRouteChildren {
   ResourcesRoute: typeof ResourcesRoute
   SolutionsRoute: typeof SolutionsRoute
   TrackRoute: typeof TrackRoute
+  DocsApiRoute: typeof DocsApiRoute
+  DocsB2bRoute: typeof DocsB2bRoute
   ApiPublicJobsWebhooksRoute: typeof ApiPublicJobsWebhooksRoute
   ApiPublicTrackCodeRoute: typeof ApiPublicTrackCodeRoute
   ApiPublicV1ShipmentsRoute: typeof ApiPublicV1ShipmentsRoute
@@ -365,6 +403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReturnsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/riders': {
+      id: '/_authenticated/riders'
+      path: '/riders'
+      fullPath: '/riders'
+      preLoaderRoute: typeof AuthenticatedRidersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/scan': {
       id: '/_authenticated/scan'
       path: '/scan'
@@ -378,6 +423,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/team'
       preLoaderRoute: typeof AuthenticatedTeamRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/docs/api': {
+      id: '/docs/api'
+      path: '/docs/api'
+      fullPath: '/docs/api'
+      preLoaderRoute: typeof DocsApiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/b2b': {
+      id: '/docs/b2b'
+      path: '/docs/b2b'
+      fullPath: '/docs/b2b'
+      preLoaderRoute: typeof DocsB2bRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/shipments/': {
       id: '/_authenticated/shipments/'
@@ -430,6 +489,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLotsRoute: typeof AuthenticatedLotsRoute
   AuthenticatedProvidersRoute: typeof AuthenticatedProvidersRoute
   AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
+  AuthenticatedRidersRoute: typeof AuthenticatedRidersRoute
   AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
   AuthenticatedShipmentsIdRoute: typeof AuthenticatedShipmentsIdRoute
@@ -442,6 +502,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLotsRoute: AuthenticatedLotsRoute,
   AuthenticatedProvidersRoute: AuthenticatedProvidersRoute,
   AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
+  AuthenticatedRidersRoute: AuthenticatedRidersRoute,
   AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
   AuthenticatedShipmentsIdRoute: AuthenticatedShipmentsIdRoute,
@@ -459,6 +520,8 @@ const rootRouteChildren: RootRouteChildren = {
   ResourcesRoute: ResourcesRoute,
   SolutionsRoute: SolutionsRoute,
   TrackRoute: TrackRoute,
+  DocsApiRoute: DocsApiRoute,
+  DocsB2bRoute: DocsB2bRoute,
   ApiPublicJobsWebhooksRoute: ApiPublicJobsWebhooksRoute,
   ApiPublicTrackCodeRoute: ApiPublicTrackCodeRoute,
   ApiPublicV1ShipmentsRoute: ApiPublicV1ShipmentsRoute,

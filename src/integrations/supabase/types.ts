@@ -416,6 +416,96 @@ export type Database = {
           },
         ]
       }
+      rider_ratings: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          rated_by: string | null
+          rating: number
+          rider_id: string
+          shipment_id: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rated_by?: string | null
+          rating: number
+          rider_id: string
+          shipment_id?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rated_by?: string | null
+          rating?: number
+          rider_id?: string
+          shipment_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rider_ratings_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rider_ratings_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: true
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rider_wallet_txns: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          kind: string
+          note: string | null
+          rider_id: string
+          shipment_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          kind?: string
+          note?: string | null
+          rider_id: string
+          shipment_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          kind?: string
+          note?: string | null
+          rider_id?: string
+          shipment_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rider_wallet_txns_rider_id_fkey"
+            columns: ["rider_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rider_wallet_txns_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shipment_events: {
         Row: {
           actor_id: string | null
@@ -738,6 +828,46 @@ export type Database = {
       can_see_shipment: {
         Args: { _s: Database["public"]["Tables"]["shipments"]["Row"] }
         Returns: boolean
+      }
+      cancel_with_otp: {
+        Args: { _id: string; _otp: string; _reason: string }
+        Returns: {
+          city: string
+          cod_amount: number
+          cod_collected: boolean
+          courier_partner_id: string | null
+          created_at: string
+          created_by: string | null
+          delivered_at: string | null
+          delivery_otp: string
+          distributor_id: string | null
+          external_order_id: string | null
+          id: string
+          is_demo: boolean
+          lot_id: string | null
+          manager_id: string | null
+          notes: string | null
+          otp_sent_at: string | null
+          otp_verified_at: string | null
+          partner_awb: string | null
+          pincode: string | null
+          receiver_address: string
+          receiver_name: string
+          receiver_phone: string
+          rider_id: string | null
+          sender_name: string
+          sender_phone: string | null
+          status: Database["public"]["Enums"]["shipment_status"]
+          tracking_code: string
+          updated_at: string
+          weight_kg: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shipments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       chain_role_id: {
         Args: { _role: Database["public"]["Enums"]["app_role"]; _user: string }

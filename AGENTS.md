@@ -21,4 +21,5 @@
 - Public visual content uses bundled logistics photos, a dedicated ParcelJourney section, and scoped GSAP matchMedia cleanup; SVG route strokes use measured path lengths — why: reusable storytelling, responsive route drawing, and reduced-motion accessibility without hidden initial content.
 - Returns/cancellations live in `return_requests` (+ events, photos in private `return-photos` bucket under `<return_id>/`); shipment status side effects run in DB triggers — why: tracking and permissions stay consistent for every client.
 - Partner API keys are stored only as SHA-256 hashes; `/api/public/v1/*` verifies the key before using the admin client, and outbound webhooks are HMAC-signed via `src/lib/webhooks.server.ts` — why: keys and secrets must never be recoverable or spoofable.
-- Phone OTP at signup is demo-only (fixed code) until an SMS provider is connected — why: no SMS credentials exist.
+- Phone OTP is demo-only (fixed code) until an SMS provider is connected; phone-only accounts use a synthetic `p<phone>@phone.bnoy.app` email created by a server function — why: no SMS credentials, and auth needs an email identity.
+- Rider wallet credits are written only by a DB trigger on shipment status (delivered/returned), idempotent per shipment — why: clients cannot mint earnings.

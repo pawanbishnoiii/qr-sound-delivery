@@ -10,7 +10,9 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { QrCode } from "@/components/QrCode";
 import { Barcode } from "@/components/Barcode";
 import { OtpDialog } from "@/components/OtpDialog";
-import { printLabels } from "@/lib/labels";
+import { CancelOtpDialog } from "@/components/CancelOtpDialog";
+import { FileText, Star } from "lucide-react";
+import { printInvoice, printLabels } from "@/lib/labels";
 import { Button } from "@/components/ui/button";
 import { useMe, useTeam } from "@/lib/auth";
 import { trackUrl, useShipments } from "@/lib/shipments";
@@ -31,6 +33,7 @@ function Detail() {
   const { data: team = [] } = useTeam();
   const [busy, setBusy] = useState(false);
   const [otpOpen, setOtpOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
   const lots = useQuery({ queryKey: ["lots"], queryFn: async () => (await supabase.from("lots").select("id, code, name").order("created_at", { ascending: false })).data ?? [] });
 
   const q = useQuery({
@@ -147,7 +150,16 @@ function Detail() {
               )}
               {!isRider && <Button variant="outline" disabled={busy} onClick={duplicate}><Copy /> Copies</Button>}
               {["delivered", "failed"].includes(s.status) && <Button variant="outline" disabled={busy} onClick={() => requestReturn(s.status === "failed" ? "rto" : "customer_return")}><Undo2 /> Request return pickup</Button>}
-              {!["delivered", "returned", "cancelled"].includes(s.status) && <Button variant="outline" className="text-destructive" disabled={busy} onClick={() => requestReturn("cancellation")}><XCircle /> Cancel parcel</Button>}
+              {!["delivered", "returned", "cancelled"].includes(s.status) && <Button variant="outline" className="text-destructive" disabled={busy} onClick={() => setCancelOpen(true)}><XCircle /> Cancel with customer OTP</Button>}
+              <Button variant="outline" onClick={() => printInvoice(s).catch((e) => toast.error(e.message))}><FileText /> Print bill</Button>
+              {!isRider && s.rider_id && s.status === "delivered" && (
+                <Button variant="outline" disabled={busy} onClick={async () => {
+                  const n = Number(prompt("Rate the rider for this delivery (1-5)", "5"));
+                  if (!n || n < 1 || n > 5 || !user) return;
+                  const { error } = await supabase.from("rider_ratings").insert({ rider_id: s.rider_id!, shipment_id: s.id, rating: Math.round(n), rated_by: user.id });
+                  if (error) toast.error(error.code === "23505" ? "Already rated" : error.message); else toast.success("Rating saved");
+                }}><Star /> Rate rider</Button>
+              )}
               {(role === "admin" || (s.created_by === user?.id && s.status === "created")) && (
                 <Button
                   variant="ghost"
@@ -211,6 +223,7 @@ function Detail() {
         </aside>
       </div>
       <OtpDialog shipment={otpOpen ? s : null} onClose={() => setOtpOpen(false)} onDone={() => { qc.invalidateQueries({ queryKey: ["shipment", id] }); qc.invalidateQueries({ queryKey: ["shipments"] }); }} />
+      <CancelOtpDialog shipment={cancelOpen ? s : null} onClose={() => setCancelOpen(false)} onDone={() => { qc.invalidateQueries({ queryKey: ["shipment", id] }); qc.invalidateQueries({ queryKey: ["shipments"] }); }} />
     </AppShell>
   );
 }
