@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Package, Truck, CheckCircle2, IndianRupee, ScanLine, Plus, Users } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { RiderHome } from "@/components/RiderHome";
+import { SeedWorkspaceButton } from "@/components/SeedWorkspaceButton";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { useMe, useTeam } from "@/lib/auth";
@@ -42,6 +43,7 @@ function LeadDashboard() {
       title={`Hi, ${profile?.full_name?.split(" ")[0] || "there"}`}
       actions={
         <>
+          {role === "admin" && <SeedWorkspaceButton />}
           <Button asChild variant="outline" size="sm"><Link to="/scan"><ScanLine /> <span className="hidden sm:inline">Scan</span></Link></Button>
           {role !== "rider" && <Button asChild variant="hero" size="sm"><Link to="/shipments" search={{ new: true }}><Plus /> <span className="hidden sm:inline">New shipment</span></Link></Button>}
         </>
