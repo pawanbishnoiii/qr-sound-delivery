@@ -56,7 +56,7 @@ export function CorridorAnalytics({ rows, now }: { rows: Shipment[]; now: number
   return (
     <div className="mt-6 grid gap-6 xl:grid-cols-[1.2fr_1fr]">
       <section className="rounded-lg border bg-card shadow-card">
-        <h2 className="border-b p-4 font-bold">Logistics corridors</h2>
+        <div className="border-b p-4"><h2 className="font-bold">Logistics corridors</h2>{byHub.size === 0 && <p className="mt-1 text-xs text-muted-foreground">No parcels in these metro cities yet. SLA fills in once parcels ship to them.</p>}</div>
         <div className="grid gap-4 p-4 md:grid-cols-[minmax(0,1fr)_220px]">
           <svg viewBox="0 0 400 460" className="w-full max-h-[460px]" role="img" aria-label="India corridor map">
             <path d="M150 40 L200 60 L235 110 L300 150 L360 170 L340 230 L290 250 L250 300 L215 360 L200 420 L170 440 L140 400 L110 330 L80 290 L60 240 L40 200 L70 170 L110 150 L120 100 Z" fill="var(--muted)" stroke="var(--border)" strokeWidth="2" />
