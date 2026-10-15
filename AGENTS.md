@@ -22,4 +22,4 @@
 - Returns/cancellations live in `return_requests` (+ events, photos in private `return-photos` bucket under `<return_id>/`); shipment status side effects run in DB triggers — why: tracking and permissions stay consistent for every client.
 - Partner API keys are stored only as SHA-256 hashes; `/api/public/v1/*` verifies the key before using the admin client, and outbound webhooks are HMAC-signed via `src/lib/webhooks.server.ts` — why: keys and secrets must never be recoverable or spoofable.
 - Phone OTP is demo-only (fixed code) until an SMS provider is connected; phone-only accounts use a synthetic `p<phone>@phone.bnoy.app` email created by a server function — why: no SMS credentials, and auth needs an email identity.
-- Rider wallet credits are written only by a DB trigger on shipment status (delivered/returned), idempotent per shipment — why: clients cannot mint earnings.
+- Wallet credits for riders, managers and distributors are written only by a DB trigger on shipment status, using admin-editable pay rates and dated bonuses, idempotent per shipment+kind — why: clients cannot mint earnings and rate changes apply without code changes.

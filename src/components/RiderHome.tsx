@@ -11,9 +11,13 @@ import { useMe } from "@/lib/auth";
 import { useShipments } from "@/lib/shipments";
 import { RIDER_FEE, riderStats, useRatings, useWalletTxns } from "@/lib/rider";
 import { fmtDate, inr, type Shipment } from "@/lib/status";
+import { activeBonusTotal, useBonuses, usePayoutSettings } from "@/lib/payouts";
 
 /** App-style home for riders: today's work, wallet, rating and accuracy. */
 export function RiderHome() {
+  const { data: pay } = usePayoutSettings();
+  const { data: bonusRows = [] } = useBonuses();
+  const bonus = activeBonusTotal(bonusRows);
   const { user, profile } = useMe();
   const qc = useQueryClient();
   const { data: rows = [] } = useShipments();
@@ -39,7 +43,7 @@ export function RiderHome() {
         <section className="rounded-2xl bg-gradient-hero p-5 text-navy-foreground shadow-card">
           <div className="flex items-center justify-between">
             <p className="flex items-center gap-2 text-sm opacity-80"><Wallet className="h-4 w-4" /> Wallet balance</p>
-            <span className="rounded-full bg-lime px-2.5 py-0.5 text-xs font-bold text-navy">₹{RIDER_FEE}/parcel</span>
+            <span className="rounded-full bg-lime px-2.5 py-0.5 text-xs font-bold text-navy">₹{Number(pay?.rider_delivery ?? RIDER_FEE) + bonus}/parcel{bonus > 0 ? " · bonus live" : ""}</span>
           </div>
           <p className="mt-1 font-display text-4xl font-bold tabular">{inr(st.wallet)}</p>
           <p className="mt-1 text-sm opacity-80">Today +{inr(st.earnedToday)} · COD to hand over {inr(st.codPending)}</p>
