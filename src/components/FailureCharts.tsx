@@ -1,13 +1,13 @@
 import { useMemo } from "react";
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { Bar, BarChart, Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
-type Row = { status: string; city: string; sender_name: string; created_at: string; updated_at: string };
+type Row = { status: string; city: string; sender_name: string; created_at: string; updated_at: string; delivered_at?: string | null };
 const UNDELIVERED = ["failed", "returned", "cancelled"] as const;
 const LABEL: Record<string, string> = { failed: "Delivery failed", returned: "Returned (RTO)", cancelled: "Cancelled" };
 const COLOR: Record<string, string> = { failed: "var(--coral)", returned: "var(--primary)", cancelled: "var(--sky)" };
 
 export function FailureCharts({ rows }: { rows: Row[] }) {
-  const { trend, breakup, total, cities, senders } = useMemo(() => {
+  const { sla, tat, trend, breakup, total, cities, senders } = useMemo(() => {
     const days = Array.from({ length: 14 }, (_, i) => {
       const d = new Date(); d.setDate(d.getDate() - 13 + i);
       return d.toISOString().slice(0, 10);
@@ -23,7 +23,15 @@ export function FailureCharts({ rows }: { rows: Row[] }) {
       rows.forEach((r) => { const g = m.get(r[key]) ?? { total: 0, bad: 0 }; g.total++; if ((UNDELIVERED as readonly string[]).includes(r.status)) g.bad++; m.set(r[key], g); });
       return [...m.entries()].map(([name, g]) => ({ name, ...g, pct: Math.round((g.bad / g.total) * 100) })).filter((g) => g.bad > 0).sort((a, b) => b.pct - a.pct || b.bad - a.bad).slice(0, 5);
     };
-    return { trend, breakup, total: breakup.reduce((a, b) => a + b.value, 0), cities: group("city"), senders: group("sender_name") };
+    const hrs = (r: Row) => (new Date(r.delivered_at!).getTime() - new Date(r.created_at).getTime()) / 36e5;
+    const del = rows.filter((r) => r.status === "delivered" && r.delivered_at);
+    const sla = days.map((day) => {
+      const d = del.filter((r) => r.delivered_at!.slice(0, 10) === day);
+      return { day: new Date(day).toLocaleDateString("en-IN", { day: "numeric", month: "short" }), pct: d.length ? Math.round((d.filter((r) => hrs(r) <= 48).length / d.length) * 100) : null };
+    });
+    const buckets: [string, number, number][] = [["< 1 day", 0, 24], ["1–2 days", 24, 48], ["2–3 days", 48, 72], ["3+ days", 72, Infinity]];
+    const tat = buckets.map(([name, a, b]) => ({ name, value: del.filter((r) => hrs(r) >= a && hrs(r) < b).length }));
+    return { sla, tat, trend, breakup, total: breakup.reduce((a, b) => a + b.value, 0), cities: group("city"), senders: group("sender_name") };
   }, [rows]);
 
   return (
@@ -59,6 +67,36 @@ export function FailureCharts({ rows }: { rows: Row[] }) {
         </div>
         <div className="flex flex-wrap justify-center gap-4 text-xs">
           {breakup.map((b) => <span key={b.key} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: COLOR[b.key] }} />{b.name} · {b.value}</span>)}
+        </div>
+      </section>
+      <section className="rounded-lg border bg-card p-5 shadow-card">
+        <h2 className="font-bold">SLA trend</h2>
+        <p className="text-xs text-muted-foreground">Delivered within 48 hours of booking · last 14 days</p>
+        <div className="mt-4 h-56">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={sla} margin={{ left: -20, right: 8 }}>
+              <CartesianGrid stroke="var(--border)" vertical={false} />
+              <XAxis dataKey="day" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} interval="preserveStartEnd" />
+              <YAxis unit="%" domain={[0, 100]} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
+              <Tooltip formatter={(v) => [`${v}%`, "Within SLA"]} contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
+              <Line type="monotone" dataKey="pct" connectNulls stroke="var(--success)" strokeWidth={2} dot={{ r: 2 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </section>
+      <section className="rounded-lg border bg-card p-5 shadow-card">
+        <h2 className="font-bold">TAT breakup</h2>
+        <p className="text-xs text-muted-foreground">Delivered parcels by time from booking to doorstep</p>
+        <div className="mt-4 h-56">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={tat} margin={{ left: -20, right: 8 }}>
+              <CartesianGrid stroke="var(--border)" vertical={false} />
+              <XAxis dataKey="name" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
+              <Tooltip formatter={(v) => [v, "Parcels"]} contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
+              <Bar dataKey="value" fill="var(--primary)" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </section>
       <FailTable title="Most failing areas" head="City" rows={cities} />
